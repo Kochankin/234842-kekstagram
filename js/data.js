@@ -34,7 +34,7 @@ function generatePhotoData(count) {
   return {
     url: 'photos/' + count + '.jpg',
     likes: getRandomInt(15, 200),
-    comments: generateComment()
+    comments: generateComment(),
   };
 }
 
