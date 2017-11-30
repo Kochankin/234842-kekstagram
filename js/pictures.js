@@ -61,7 +61,7 @@ function closePhoto() {
 }
 
 // функция для закрытия фото по кнопке Esc
-var onPopupEscPress = function (event) {
+function onPopupEscPress(event) {
   if (event.keyCode === ESC_KEYCODE) {
     closePhoto();
   }
@@ -99,3 +99,55 @@ closePhotoIcon.addEventListener('keydown', function (event) {
     closePhoto();
   }
 });
+
+// переменные для работы с формой загрузки фото
+var uploadForm = document.querySelector('.upload-form');
+var uploadOverlay = document.querySelector('.upload-overlay');
+var uploadImgFile = document.querySelector('#upload-file');
+var closeUploadFormIcon = document.querySelector('#upload-cancel');
+var submitUploadForm =document.querySelector('#upload-submit')
+
+// функция для закрытия фото по кнопке Esc
+function onUploadFormEscPress(event) {
+  if (event.keyCode === ESC_KEYCODE) {
+    closeUploadForm();
+  }
+};
+
+// открыть форму загрузки фото
+function openUploadForm() {
+  uploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', onUploadFormEscPress);
+}
+uploadImgFile.addEventListener('change', openUploadForm);
+uploadForm.addEventListener('keydown', function (event) {
+  if (event.keyCode === ENTER_KEYCODE) {
+    openUploadForm();
+  }
+});
+
+// закрыть форму загрузки фото
+function closeUploadForm() {
+  uploadOverlay.classList.add('hidden');
+  document.removeEventListener('keydown', onUploadFormEscPress);
+}
+closeUploadFormIcon.addEventListener('click', closeUploadForm);
+closeUploadFormIcon.addEventListener('keydown', function (event) {
+  if (event.keyCode === ENTER_KEYCODE) {
+    closeUploadForm();
+  }
+});
+
+// отправить фото
+function submitPhoto(){
+  uploadForm.submit();
+}
+submitUploadForm.addEventListener('click', submitPhoto);
+submitUploadForm.addEventListener('keydown', function (event) {
+  if (event.keyCode === ENTER_KEYCODE) {
+    submitPhoto();
+  }
+
+});
+
+
