@@ -157,16 +157,16 @@ function check() {
     if (event.target === radioEffect[j]) {
       var id = radioEffect[j].getAttribute('id');
       var effect = id.slice(7); 
+      if (image.classList){
+        image.setAttribute('class', '');
+      }
       image.classList.add(effect);
-    }
+    }   
   }
 }
 
+for (var i = 0; i < radioEffect.length; i++) {  
+  radioEffect[i].addEventListener('click', check);
+}      
 
-function setImageEffect() {
-  for (var i = 0; i < radioEffect.length; i++) {  
-    radioEffect[i].addEventListener('click', check);
-  }      
-}
 
-setImageEffect();
