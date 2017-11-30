@@ -108,6 +108,7 @@ var closeUploadFormIcon = document.querySelector('#upload-cancel');
 var submitUploadForm =document.querySelector('#upload-submit')
 var image = document.querySelector('.effect-image-preview');
 var radioEffect = document.querySelectorAll('[name="effect"]');
+var uploadEffectLevel = document.querySelector('.upload-effect-level');
 
 // функция для закрытия фото по кнопке Esc
 function onUploadFormEscPress(event) {
@@ -152,21 +153,18 @@ submitUploadForm.addEventListener('keydown', function (event) {
 });
 
 // выбор эффекта по радиокнопке
-function check() {
-  for (var j = 0; j < radioEffect.length; j++) {
-    if (event.target === radioEffect[j]) {
-      var id = radioEffect[j].getAttribute('id');
-      var effect = id.slice(7); 
-      if (image.classList){
+function onRadioEffectClick (event) {
+  for (var i = 0; i < event.path.length; i++) {
+    var element = event.path[i];
+    if (element.classList && element.classList.contains('upload-effect-label')) {
+      var id = element.previousElementSibling.getAttribute('id');
+      var effect = id.slice(7);
+      if (image.classList) {
         image.setAttribute('class', '');
       }
       image.classList.add(effect);
-    }   
+    }
   }
 }
 
-for (var i = 0; i < radioEffect.length; i++) {  
-  radioEffect[i].addEventListener('click', check);
-}      
-
-
+document.body.addEventListener('click', onRadioEffectClick);
