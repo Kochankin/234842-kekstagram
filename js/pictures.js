@@ -106,6 +106,8 @@ var uploadOverlay = document.querySelector('.upload-overlay');
 var uploadImgFile = document.querySelector('#upload-file');
 var closeUploadFormIcon = document.querySelector('#upload-cancel');
 var submitUploadForm =document.querySelector('#upload-submit')
+var image = document.querySelector('.effect-image-preview');
+var radioEffect = document.querySelectorAll('[name="effect"]');
 
 // функция для закрытия фото по кнопке Esc
 function onUploadFormEscPress(event) {
@@ -147,7 +149,24 @@ submitUploadForm.addEventListener('keydown', function (event) {
   if (event.keyCode === ENTER_KEYCODE) {
     submitPhoto();
   }
-
 });
 
+// выбор эффекта по радиокнопке
+function check() {
+  for (var j = 0; j < radioEffect.length; j++) {
+    if (event.target === radioEffect[j]) {
+      var id = radioEffect[j].getAttribute('id');
+      var effect = id.slice(7); 
+      image.classList.add(effect);
+    }
+  }
+}
 
+
+function setImageEffect() {
+  for (var i = 0; i < radioEffect.length; i++) {  
+    radioEffect[i].addEventListener('click', check);
+  }      
+}
+
+setImageEffect();

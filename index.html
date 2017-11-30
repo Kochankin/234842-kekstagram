@@ -36,7 +36,7 @@
           <button type="button"
                   class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-dec">–
           </button><!--
-          --><input type="text" class="upload-resize-control upload-resize-controls-value" value="55%" readonly title="Image Scale" name="scale"/><!--
+          --><input type="text" class="upload-resize-control upload-resize-controls-value" value="55%" step="25" min="25" max="100" readonly title="Image Scale" name="scale"/><!--
           --><button type="button"
                   class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-inc">+
           </button>
@@ -95,7 +95,7 @@
 
         <input class="upload-form-hashtags" name="hashtags" placeholder="#хэш-тег">
 
-        <textarea class="upload-form-description" name="description" placeholder="Ваш комментарий..."></textarea>
+        <textarea class="upload-form-description" name="description" placeholder="Ваш комментарий..." optional max="140"></textarea>
 
         <button class="upload-form-cancel" type="reset" id="upload-cancel">Закрыть</button>
         <button class="upload-form-submit" type="submit" id="upload-submit" >Отправить</button>
@@ -113,7 +113,7 @@
 <footer class="footer container">
   <div class="center-wrapper">
     <section class="footer-logo">
-      Сделано в <a tabindex="1" href="http://htmlacademy.ru" class="footer-logo-link"><img src="img/ha-logo.png" class="footer-logo-image" width="130" alt="HTML Academy"/>HTML Academy</a> &copy; 2017
+      Сделано в <a tabindex="0" href="http://htmlacademy.ru" class="footer-logo-link"><img src="img/ha-logo.png" class="footer-logo-image" width="130" alt="HTML Academy"/>HTML Academy</a> &copy; 2017
     </section>
 
     <nav class="footer-social">
