@@ -42,6 +42,8 @@ function init() {
 }
 init();
 
+// //////////////// добавить все функции потом в init!!! ///////////////
+
 // коды для кнопок Esc и Enter
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -65,7 +67,7 @@ function onPopupEscPress(event) {
   if (event.keyCode === ESC_KEYCODE) {
     closePhoto();
   }
-};
+}
 
 // обработчик при клике на картинку
 function onPictureClick(event) {
@@ -100,22 +102,26 @@ closePhotoIcon.addEventListener('keydown', function (event) {
   }
 });
 
+// /////////////////////////////////////////////////////////////////////
 // переменные для работы с формой загрузки фото
 var uploadForm = document.querySelector('.upload-form');
 var uploadOverlay = document.querySelector('.upload-overlay');
 var uploadImgFile = document.querySelector('#upload-file');
 var closeUploadFormIcon = document.querySelector('#upload-cancel');
-var submitUploadForm =document.querySelector('#upload-submit')
+var submitUploadForm = document.querySelector('#upload-submit');
 var image = document.querySelector('.effect-image-preview');
-var radioEffect = document.querySelectorAll('[name="effect"]');
-var uploadEffectLevel = document.querySelector('.upload-effect-level');
+var imgScaleDownIcon = document.querySelector('.upload-resize-controls-button-dec');
+var imgEnlargeIcon = document.querySelector('.upload-resize-controls-button-inc');
+var scaleValueField = document.querySelector('.upload-resize-controls-value');
+var scaleValue = scaleValueField.getAttribute('value');
+var SCALE_STEP = scaleValueField.getAttribute('step');
 
 // функция для закрытия фото по кнопке Esc
 function onUploadFormEscPress(event) {
   if (event.keyCode === ESC_KEYCODE) {
     closeUploadForm();
   }
-};
+}
 
 // открыть форму загрузки фото
 function openUploadForm() {
@@ -125,7 +131,7 @@ function openUploadForm() {
 uploadImgFile.addEventListener('change', openUploadForm);
 uploadForm.addEventListener('keydown', function (event) {
   if (event.keyCode === ENTER_KEYCODE) {
-    openUploadForm();
+    uploadImgFile.click();
   }
 });
 
@@ -142,7 +148,7 @@ closeUploadFormIcon.addEventListener('keydown', function (event) {
 });
 
 // отправить фото
-function submitPhoto(){
+function submitPhoto() {
   uploadForm.submit();
 }
 submitUploadForm.addEventListener('click', submitPhoto);
@@ -152,8 +158,9 @@ submitUploadForm.addEventListener('keydown', function (event) {
   }
 });
 
+// /////////////////////////////////////////////////////////////////////
 // выбор эффекта по радиокнопке
-function onRadioEffectClick (event) {
+function onRadioEffectClick(event) {
   for (var i = 0; i < event.path.length; i++) {
     var element = event.path[i];
     if (element.classList && element.classList.contains('upload-effect-label')) {
@@ -166,5 +173,24 @@ function onRadioEffectClick (event) {
     }
   }
 }
-
 document.body.addEventListener('click', onRadioEffectClick);
+
+/////////////////////////////////////////////////////////////////////
+// увеличение и уменьшение масштаба фото
+var imgResizeTool = document.querySelector('.upload-resize-controls');
+
+function onImgResizeIconClick(event) {
+  for (var i = 0; i < event.path.length; i++) {
+    var element = event.path[i];
+    if (element === imgScaleDownIcon && scaleValue !== '25%') {
+      scaleValue = (parseInt(scaleValue, 10) - SCALE_STEP) + '%';     
+    }
+    if (element === imgEnlargeIcon && scaleValue !== '100%') {
+      scaleValue = parseInt(scaleValue, 10) + Number(SCALE_STEP) + '%';
+    }
+    scaleValueField.setAttribute('value', scaleValue);
+    var transformScaleValue = parseInt(scaleValue, 10) * 0.01;
+    image.style.transform = 'scale(' + transformScaleValue + ')';
+  }
+}
+imgResizeTool.addEventListener('click', onImgResizeIconClick);
