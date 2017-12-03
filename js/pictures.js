@@ -132,7 +132,7 @@ function submitPhoto() {
   image.style.transform = 'scale(1)';
   image.setAttribute('class', '');
   image.classList.add('effect-image-preview');
-  var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]'); radioEffect.forEach(function (item, arr) {
+  var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]'); radioEffect.forEach(function (item) {
     item.checked = false;
     radioEffect[0].checked = true;
   });
@@ -245,7 +245,7 @@ function onFormFillingIn() {
 
   if (errorsMessageArray.length !== 0) {
     var errorMessageText = '';
-    errorsMessageArray.forEach(function (item, arr) {
+    errorsMessageArray.forEach(function (item) {
       errorMessageText += item;
       errorMessageHTML.textContent = errorMessageText;
     });
