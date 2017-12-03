@@ -7,7 +7,7 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <title>Кекстаграм</title>
 </head>
-<body>
+<body> 
 
 <form class="filters filters-inactive" action="index.html" method="get" autocomplete="off">
   <input type="radio" id="filter-recommend" class="filters-radio" name="filter" value="recommend" checked>
@@ -23,8 +23,8 @@
   <label for="filter-random" class="filters-item">Случайные</label>
 </form>
 
-<form class="upload-form" id="upload-select-image" method="post" enctype="multipart/form-data" autocomplete="off">
-  <div class="upload-image">
+<form class="upload-form" id="upload-select-image" method="post" action="https://js.dump.academy/kekstagram" enctype="multipart/form-data" autocomplete="off" target='_blank'>
+  <div class="upload-image" tabindex="0">
     <input type="file" id="upload-file" class="upload-input" name="filename" required>
     <label class="upload-file upload-control" for="upload-file"></label>
   </div>
@@ -36,7 +36,7 @@
           <button type="button"
                   class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-dec">–
           </button><!--
-          --><input type="text" class="upload-resize-control upload-resize-controls-value" value="55%" readonly title="Image Scale" name="scale"/><!--
+          --><input type="text" class="upload-resize-control upload-resize-controls-value" value="100%" step="25" min="25" max="100" readonly title="Image Scale" name="scale"/><!--
           --><button type="button"
                   class="upload-resize-control upload-resize-controls-button upload-resize-controls-button-inc">+
           </button>
@@ -93,12 +93,12 @@
           </label>
         </fieldset>
 
-        <input class="upload-form-hashtags" name="hashtags" placeholder="#хэш-тег">
+        <input class="upload-form-hashtags" name="hashtags" placeholder="#хэш-тег" optional>
 
-        <textarea class="upload-form-description" name="description" placeholder="Ваш комментарий..."></textarea>
+        <textarea class="upload-form-description" name="description" placeholder="Ваш комментарий..." optional max="140"></textarea>
 
         <button class="upload-form-cancel" type="reset" id="upload-cancel">Закрыть</button>
-        <button class="upload-form-submit" type="submit" id="upload-submit">Отправить</button>
+        <button class="upload-form-submit" type="submit" id="upload-submit" >Отправить</button>
       </div>
     </div>
   </div>
@@ -113,7 +113,7 @@
 <footer class="footer container">
   <div class="center-wrapper">
     <section class="footer-logo">
-      Сделано в <a tabindex="1" href="http://htmlacademy.ru" class="footer-logo-link"><img src="img/ha-logo.png" class="footer-logo-image" width="130" alt="HTML Academy"/>HTML Academy</a> &copy; 2017
+      Сделано в <a tabindex="0" href="http://htmlacademy.ru" class="footer-logo-link"><img src="img/ha-logo.png" class="footer-logo-image" width="130" alt="HTML Academy"/>HTML Academy</a> &copy; 2017
     </section>
 
     <nav class="footer-social">
