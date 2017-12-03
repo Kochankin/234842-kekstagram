@@ -35,15 +35,6 @@ function renderPictures(pictureData) {
   picturesContainer.appendChild(documentFragment);
 }
 
-// запускаем генерацию объектов и создание шаблонов на их основе
-function init() {
-  photosData = getPhotosData(25);
-  renderPictures(photosData);
-}
-init();
-
-// //////////////// добавить все функции потом в init!!! ///////////////
-
 // коды для кнопок Esc и Enter
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -84,25 +75,6 @@ function onPictureClick(event) {
   }
 }
 
-// ставим обработчики открытия галереи
-picturesContainer.addEventListener('click', onPictureClick, true);
-picturesContainer.addEventListener('keydown', function (event) {
-  if (event.keyCode === ENTER_KEYCODE) {
-    onPictureClick();
-  }
-});
-
-// добавляем обработчики закрытия фото
-closePhotoIcon.addEventListener('click', function () {
-  closePhoto();
-});
-closePhotoIcon.addEventListener('keydown', function (event) {
-  if (event.keyCode === ENTER_KEYCODE) {
-    closePhoto();
-  }
-});
-
-// /////////////////////////////////////////////////////////////////////
 // переменные для работы с формой загрузки фото
 var uploadForm = document.querySelector('.upload-form');
 var uploadOverlay = document.querySelector('.upload-overlay');
@@ -115,10 +87,11 @@ var imgEnlargeIcon = document.querySelector('.upload-resize-controls-button-inc'
 var scaleValueField = document.querySelector('.upload-resize-controls-value');
 var scaleValue = scaleValueField.getAttribute('value');
 var SCALE_STEP = scaleValueField.getAttribute('step');
+var SCALE_DEFAULT = '100%';
 var imgResizeTool = document.querySelector('.upload-resize-controls');
 var hashtagsField = document.querySelector('.upload-form-hashtags');
 var commentField = document.querySelector('.upload-form-description');
-
+var uploadEffectControls = document.querySelector('.upload-effect-controls');
 
 // функция для закрытия фото по кнопке Esc
 function onUploadFormEscPress(event) {
@@ -151,18 +124,22 @@ closeUploadFormIcon.addEventListener('keydown', function (event) {
   }
 });
 
+
 // отправить фото
 function submitPhoto() {
   uploadForm.submit();
+  scaleValueField.setAttribute('value', SCALE_DEFAULT);
+  image.style.transform = 'scale(1)';
+  image.setAttribute('class', '');
+  image.classList.add('effect-image-preview');
+  var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]'); radioEffect.forEach(function (item, arr) {
+    item.checked = false;
+    radioEffect[0].checked = true;
+  });
+  hashtagsField.value = '';
+  commentField.value = '';
 }
-submitUploadForm.addEventListener('click', submitPhoto);
-submitUploadForm.addEventListener('keydown', function (event) {
-  if (event.keyCode === ENTER_KEYCODE) {
-    submitPhoto();
-  }
-});
 
-// /////////////////////////////////////////////////////////////////////
 // выбор эффекта по радиокнопке
 function onRadioEffectClick(event) {
   for (var i = 0; i < event.path.length; i++) {
@@ -172,14 +149,15 @@ function onRadioEffectClick(event) {
       var effect = id.slice(7);
       if (image.classList) {
         image.setAttribute('class', '');
+        image.classList.add('effect-image-preview');
       }
       image.classList.add(effect);
     }
   }
 }
-document.body.addEventListener('click', onRadioEffectClick);
-// ///////////////////////////////////////////////////////////////////
+
 // увеличение и уменьшение масштаба фото
+
 function onImgResizeIconClick(event) {
   for (var i = 0; i < event.path.length; i++) {
     var element = event.path[i];
@@ -194,9 +172,7 @@ function onImgResizeIconClick(event) {
     image.style.transform = 'scale(' + transformScaleValue + ')';
   }
 }
-imgResizeTool.addEventListener('click', onImgResizeIconClick);
 
-// ///////////////////////////////////////////////////////////////////
 // проверка на уникальность - если возвращает false, то есть дубли
 function isUnique(array) {
   var items = array.slice(1);
@@ -215,14 +191,22 @@ function isUnique(array) {
   }
 }
 
+// узел для сообщений об ошибке
+commentField.insertAdjacentHTML('afterend', '<p></p>');
+var errorMessageHTML = commentField.nextElementSibling;
+errorMessageHTML.classList.add('error-message');
 
 function onFormFillingIn() {
-  // сообщения об ошибках
+  if (errorMessageHTML.textContent) {
+    errorMessageHTML.textContent = '';
+    submitUploadForm.removeAttribute('disabled');
+    hashtagsField.style.borderColor = 'black';
+    hashtagsField.style.borderWidth = '1px';
+    commentField.style.borderWidth = '1px';
+  }
+
+  // массив с сообщениями об ошибках
   var errorsMessageArray = [];
-  // узел для сообщений об ошибке
-  commentField.insertAdjacentHTML('afterend', '<p></p>');
-  var errorMessageHTML = commentField.nextElementSibling;
-  errorMessageHTML.classList.add('error-message');
   // массив из введенных хештегов
   var hashtagsArray = hashtagsField.value.split(' ');
   hashtagsArray = hashtagsArray.filter(function (hashtag) {
@@ -234,45 +218,81 @@ function onFormFillingIn() {
     return hashtag.match(/#[A-Za-zА-Яа-яЁё0-9]{1,20}/);
   });
 
+  function makeBorderRed(element) {
+    element.style.borderColor = 'red';
+    element.style.borderWidth = '2px';
+  }
+
   if (!hashtagValidity) {
     errorsMessageArray.push('Хеш-тег должен начинаться с символа # и разделяться пробелами, длина не должна превышать 20 символов.');
-    hashtagsField.style.borderColor = 'red';
+    makeBorderRed(hashtagsField);
   }
 
   if (hashtagsArray.length > 5) {
     errorsMessageArray.push('Количество хештегов не должно превышать 5.');
-    hashtagsField.style.borderColor = 'red';
+    makeBorderRed(hashtagsField);
   }
 
   if (!isUnique(hashtagsArray)) {
     errorsMessageArray.push('Не допускается повторение хештегов.');
-    hashtagsField.style.borderColor = 'red';
-  }
- 
-  if (commentField.value.length > 140){
-    errorsMessageArray.push('Длина комментария не должна превышать 140 символов.');
-    commentField.style.borderColor = 'red';
-    commentField.style.borderWidth = '2px';
+    makeBorderRed(hashtagsField);
   }
 
-  // если ошибки есть...
-  if (errorsMessageArray.length !== 0) {
-   // создаем строку из текста об ошибке
-    var errorMessageText = '';
-    errorsMessageArray.forEach(function(item, arr) { 
-      errorMessageText += item;   
-      errorMessageHTML.textContent = errorMessageText; 
-      submitUploadForm.setAttribute('disabled', 'disable');
-    });
+  if (commentField.value.length > 140) {
+    errorsMessageArray.push('Длина комментария не должна превышать 140 символов.');
+    makeBorderRed(commentField);
   }
-  else {
-   // test.removeChild(errorMessageHTML);
+
+  if (errorsMessageArray.length !== 0) {
+    var errorMessageText = '';
+    errorsMessageArray.forEach(function (item, arr) {
+      errorMessageText += item;
+      errorMessageHTML.textContent = errorMessageText;
+    });
+    submitUploadForm.setAttribute('disabled', 'disable');
   }
 }
 
-// validity check
-uploadForm.addEventListener('input', onFormFillingIn);
+// запускаем главную функцию
+function init() {
+  photosData = getPhotosData(25);
+  renderPictures(photosData);
 
-// после все функции поставить в init
-// решить вопрос с тем, чтобы сообщение об ошибке и красные рамки с отключением кнопки убирались, когда все ок
-// сброс форм по умолчанию
+  // ставим обработчики открытия галереи
+  picturesContainer.addEventListener('click', onPictureClick, true);
+  picturesContainer.addEventListener('keydown', function (event) {
+    if (event.keyCode === ENTER_KEYCODE) {
+      onPictureClick();
+    }
+  });
+
+  // добавляем обработчики закрытия фото
+  closePhotoIcon.addEventListener('click', function () {
+    closePhoto();
+  });
+  closePhotoIcon.addEventListener('keydown', function (event) {
+    if (event.keyCode === ENTER_KEYCODE) {
+      closePhoto();
+    }
+  });
+
+  // отправка формы с фото
+  submitUploadForm.addEventListener('click', submitPhoto);
+  submitUploadForm.addEventListener('keydown', function (event) {
+    if (event.keyCode === ENTER_KEYCODE) {
+      submitPhoto();
+    }
+  });
+
+  // эффекты для фото
+  document.body.addEventListener('click', onRadioEffectClick);
+
+  // изменение масштаба фото
+  imgResizeTool.addEventListener('click', onImgResizeIconClick);
+
+  // валидация формы
+  uploadForm.addEventListener('input', onFormFillingIn);
+}
+
+init();
+
