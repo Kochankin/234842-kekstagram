@@ -86,18 +86,25 @@ var imgScaleDownIcon = document.querySelector('.upload-resize-controls-button-de
 var imgEnlargeIcon = document.querySelector('.upload-resize-controls-button-inc');
 var scaleValueField = document.querySelector('.upload-resize-controls-value');
 var scaleValue = scaleValueField.getAttribute('value');
-var SCALE_STEP = scaleValueField.getAttribute('step');
+var scaleStep = scaleValueField.getAttribute('step');
 var SCALE_DEFAULT = '100%';
 var imgResizeTool = document.querySelector('.upload-resize-controls');
 var hashtagsField = document.querySelector('.upload-form-hashtags');
 var commentField = document.querySelector('.upload-form-description');
 var uploadEffectControls = document.querySelector('.upload-effect-controls');
 
-// функция для закрытия фото по кнопке Esc
-function onUploadFormEscPress(event) {
-  if (event.keyCode === ESC_KEYCODE) {
-    closeUploadForm();
-  }
+function resetToDefault() {
+  scaleValueField.setAttribute('value', SCALE_DEFAULT);
+  image.style.transform = 'scale(1)';
+  image.setAttribute('class', '');
+  image.classList.add('effect-image-preview');
+  var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]');
+  radioEffect.forEach(function (item) {
+    item.checked = false;
+    radioEffect[0].checked = true;
+  });
+  hashtagsField.value = '';
+  commentField.value = '';
 }
 
 // открыть форму загрузки фото
@@ -115,29 +122,20 @@ uploadForm.addEventListener('keydown', function (event) {
 // закрыть форму загрузки фото
 function closeUploadForm() {
   uploadOverlay.classList.add('hidden');
+  resetToDefault();
   document.removeEventListener('keydown', onUploadFormEscPress);
 }
-closeUploadFormIcon.addEventListener('click', closeUploadForm);
-closeUploadFormIcon.addEventListener('keydown', function (event) {
-  if (event.keyCode === ENTER_KEYCODE) {
+// функция для закрытия фото по кнопке Esc
+function onUploadFormEscPress(event) {
+  if (event.keyCode === ESC_KEYCODE) {
     closeUploadForm();
   }
-});
-
+}
 
 // отправить фото
 function submitPhoto() {
   uploadForm.submit();
-  scaleValueField.setAttribute('value', SCALE_DEFAULT);
-  image.style.transform = 'scale(1)';
-  image.setAttribute('class', '');
-  image.classList.add('effect-image-preview');
-  var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]'); radioEffect.forEach(function (item) {
-    item.checked = false;
-    radioEffect[0].checked = true;
-  });
-  hashtagsField.value = '';
-  commentField.value = '';
+  resetToDefault();
 }
 
 // выбор эффекта по радиокнопке
@@ -162,10 +160,10 @@ function onImgResizeIconClick(event) {
   for (var i = 0; i < event.path.length; i++) {
     var element = event.path[i];
     if (element === imgScaleDownIcon && scaleValue !== '25%') {
-      scaleValue = (parseInt(scaleValue, 10) - SCALE_STEP) + '%';
+      scaleValue = (parseInt(scaleValue, 10) - scaleStep) + '%';
     }
     if (element === imgEnlargeIcon && scaleValue !== '100%') {
-      scaleValue = parseInt(scaleValue, 10) + Number(SCALE_STEP) + '%';
+      scaleValue = parseInt(scaleValue, 10) + Number(scaleStep) + '%';
     }
     scaleValueField.setAttribute('value', scaleValue);
     var transformScaleValue = parseInt(scaleValue, 10) * 0.01;
@@ -201,6 +199,7 @@ function onFormFillingIn() {
     errorMessageHTML.textContent = '';
     submitUploadForm.removeAttribute('disabled');
     hashtagsField.style.borderColor = 'black';
+    commentField.style.borderColor = 'black';
     hashtagsField.style.borderWidth = '1px';
     commentField.style.borderWidth = '1px';
   }
@@ -273,6 +272,14 @@ function init() {
   closePhotoIcon.addEventListener('keydown', function (event) {
     if (event.keyCode === ENTER_KEYCODE) {
       closePhoto();
+    }
+  });
+
+  // закрываем форму загрузки фото
+  closeUploadFormIcon.addEventListener('click', closeUploadForm);
+  closeUploadFormIcon.addEventListener('keydown', function (event) {
+    if (event.keyCode === ENTER_KEYCODE) {
+      closeUploadForm();
     }
   });
 
