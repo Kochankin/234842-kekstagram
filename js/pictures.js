@@ -115,6 +115,10 @@ var imgEnlargeIcon = document.querySelector('.upload-resize-controls-button-inc'
 var scaleValueField = document.querySelector('.upload-resize-controls-value');
 var scaleValue = scaleValueField.getAttribute('value');
 var SCALE_STEP = scaleValueField.getAttribute('step');
+var imgResizeTool = document.querySelector('.upload-resize-controls');
+var hashtagsField = document.querySelector('.upload-form-hashtags');
+var commentField = document.querySelector('.upload-form-description');
+
 
 // функция для закрытия фото по кнопке Esc
 function onUploadFormEscPress(event) {
@@ -174,16 +178,13 @@ function onRadioEffectClick(event) {
   }
 }
 document.body.addEventListener('click', onRadioEffectClick);
-
-/////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////
 // увеличение и уменьшение масштаба фото
-var imgResizeTool = document.querySelector('.upload-resize-controls');
-
 function onImgResizeIconClick(event) {
   for (var i = 0; i < event.path.length; i++) {
     var element = event.path[i];
     if (element === imgScaleDownIcon && scaleValue !== '25%') {
-      scaleValue = (parseInt(scaleValue, 10) - SCALE_STEP) + '%';     
+      scaleValue = (parseInt(scaleValue, 10) - SCALE_STEP) + '%';
     }
     if (element === imgEnlargeIcon && scaleValue !== '100%') {
       scaleValue = parseInt(scaleValue, 10) + Number(SCALE_STEP) + '%';
@@ -194,3 +195,84 @@ function onImgResizeIconClick(event) {
   }
 }
 imgResizeTool.addEventListener('click', onImgResizeIconClick);
+
+// ///////////////////////////////////////////////////////////////////
+// проверка на уникальность - если возвращает false, то есть дубли
+function isUnique(array) {
+  var items = array.slice(1);
+  var itemsCount = 0;
+  for (var i = 0; i < array.length; i++) {
+    for (var j = 0; j < items.length; j++) {
+      if (array[i] === items[j]) {
+        itemsCount++;
+      }
+    }
+  }
+  if (itemsCount > array.length) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+function onFormFillingIn() {
+  // сообщения об ошибках
+  var errorsMessageArray = [];
+  // узел для сообщений об ошибке
+  commentField.insertAdjacentHTML('afterend', '<p></p>');
+  var errorMessageHTML = commentField.nextElementSibling;
+  errorMessageHTML.classList.add('error-message');
+  // массив из введенных хештегов
+  var hashtagsArray = hashtagsField.value.split(' ');
+  hashtagsArray = hashtagsArray.filter(function (hashtag) {
+    return hashtag;
+  });
+
+  // проверка регулярки.вернет false, если хоть один критерий не соблюден
+  var hashtagValidity = hashtagsArray.every(function (hashtag) {
+    return hashtag.match(/#[A-Za-zА-Яа-яЁё0-9]{1,20}/);
+  });
+
+  if (!hashtagValidity) {
+    errorsMessageArray.push('Хеш-тег должен начинаться с символа # и разделяться пробелами, длина не должна превышать 20 символов.');
+    hashtagsField.style.borderColor = 'red';
+  }
+
+  if (hashtagsArray.length > 5) {
+    errorsMessageArray.push('Количество хештегов не должно превышать 5.');
+    hashtagsField.style.borderColor = 'red';
+  }
+
+  if (!isUnique(hashtagsArray)) {
+    errorsMessageArray.push('Не допускается повторение хештегов.');
+    hashtagsField.style.borderColor = 'red';
+  }
+ 
+  if (commentField.value.length > 140){
+    errorsMessageArray.push('Длина комментария не должна превышать 140 символов.');
+    commentField.style.borderColor = 'red';
+    commentField.style.borderWidth = '2px';
+  }
+
+  // если ошибки есть...
+  if (errorsMessageArray.length !== 0) {
+   // создаем строку из текста об ошибке
+    var errorMessageText = '';
+    errorsMessageArray.forEach(function(item, arr) { 
+      errorMessageText += item;   
+      errorMessageHTML.textContent = errorMessageText; 
+      submitUploadForm.setAttribute('disabled', 'disable');
+    });
+  }
+  else {
+   // test.removeChild(errorMessageHTML);
+  }
+}
+
+// validity check
+uploadForm.addEventListener('input', onFormFillingIn);
+
+// после все функции поставить в init
+// решить вопрос с тем, чтобы сообщение об ошибке и красные рамки с отключением кнопки убирались, когда все ок
+// сброс форм по умолчанию
