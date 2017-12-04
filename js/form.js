@@ -14,7 +14,7 @@
   var SCALE_DEFAULT = '100%';
   var scaleDownIcon = document.querySelector('.upload-resize-controls-button-dec');
   var enlargeIcon = document.querySelector('.upload-resize-controls-button-inc');
-  var scaleValueField = document.querySelector('.upload-resize-controls-value'); 
+  var scaleValueField = document.querySelector('.upload-resize-controls-value');
   var scaleValue = scaleValueField.getAttribute('value');
   var scaleStep = scaleValueField.getAttribute('step');
 
@@ -33,13 +33,13 @@
   function resetToDefault() {
     scaleValueField.setAttribute('value', SCALE_DEFAULT);
     image.style.transform = 'scale(1)';
-    image.setAttribute('class', ''); 
+    image.setAttribute('class', '');
     image.classList.add('effect-image-preview');
     var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]');
     radioEffect.forEach(function (item) {
       item.checked = false;
       radioEffect[0].checked = true;
-    }); 
+    });
     hashtagsField.value = '';
     commentField.value = '';
   }
