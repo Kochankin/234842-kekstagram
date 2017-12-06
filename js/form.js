@@ -182,4 +182,83 @@
   };
 
   window.form.initUploadForm();
+
+  // ползунок
+  // переменные для ползунка
+  var slider = document.querySelector('.upload-effect-level-line');
+  var thumb = slider.querySelector('.upload-effect-level-pin');
+  thumb.style.position = 'relative';
+  var saturationValue = document.querySelector('.upload-effect-level-value');
+  var saturationLevel = slider.querySelector('.upload-effect-level-val');
+
+  // получаем координаты слайдера
+
+  var sliderClientCoords = slider.getBoundingClientRect();
+  var sliderCoords = {};
+  sliderCoords.top = sliderClientCoords.top + pageYOffset;
+  sliderCoords.left = sliderClientCoords.left + pageXOffset;
+  saturationLevel.style.top = '1%';
+
+  // MOUSEDOWN
+  thumb.addEventListener('mousedown', function (event) {
+    event.preventDefault();
+    thumb.ondragstart = function () {
+      return false;
+    };
+
+    // получаем координаты самой точки
+    var thumbClientCoords = thumb.getBoundingClientRect();
+    var thumbCoords = {};
+    console.log(thumbCoords);
+    thumbCoords.top = thumbClientCoords.top + pageYOffset;
+	  thumbCoords.left = thumbClientCoords.left + pageXOffset;
+
+    // максимально возможное правое положение точки
+    var right = slider.offsetWidth;
+
+    // сдвиг мышки относительно точки
+    var shiftX = event.pageX - thumbCoords.left;
+
+    // MOUSEMOVE
+    var onMouseMove = function (moveEvent) {
+      moveEvent.preventDefault();
+
+      // =от текущего положения мыши до левого края слайдера
+      var newLeft = moveEvent.pageX - sliderCoords.left - shiftX;
+      if (newLeft < 0) {
+        newLeft = 0;
+      }// если меньше нуля, обнуляем
+      if (newLeft > right) {
+        newLeft = right;
+      }// если мышь уходит вправо, не позволяем выйти ей за максим.возможное расстояние
+      thumb.style.left = newLeft + 'px';// задаем местонахождение
+      var percentValue = Math.round(newLeft / right * 100);
+      saturationValue.setAttribute('value', percentValue);
+      saturationLevel.style.width = percentValue + '%';
+      // объект с эффектами
+      var effectsObject = {
+        chrome: 'grayscale(' + (newLeft / right).toFixed(1) + ')',
+        sepia: 'sepia(' + (newLeft / right).toFixed(1) + ')',
+        marvin: 'invert(' + (newLeft / right).toFixed(1) + ')',
+        phobos: 'blur(' + Math.round(newLeft / right * 3) + 'px)',
+        heat: 'brightness(' + (newLeft / right).toFixed(1) * 3 + ')'
+      };
+      // смотрим в классе эффект, если он есть
+      if (image.classList[1]) { // добавляем обработку с ползунком
+        var effect = image.classList[1].slice(7);
+        image.style.filter = effectsObject[effect];
+      }
+      return false;
+    };
+
+    var onMouseUp = function (upEvent) {
+      upEvent.preventDefault();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
 })();
