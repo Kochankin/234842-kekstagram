@@ -24,6 +24,17 @@
 
   var uploadEffectControls = document.querySelector('.upload-effect-controls');// блок с мини-превьюшками эффектов
 
+  // переменные для ползунка
+  var effectsSliderContainer = document.querySelector('.upload-effect-level');
+  var slider = document.querySelector('.upload-effect-level-line');
+  var thumb = slider.querySelector('.upload-effect-level-pin');
+  thumb.style.position = 'relative';
+  var saturationValue = document.querySelector('.upload-effect-level-value');
+  var saturationLevel = slider.querySelector('.upload-effect-level-val');
+
+  // прячем ползунок
+  //  effectsSliderContainer.classList.add('hidden');
+
   // узел для сообщений об ошибке
   commentField.insertAdjacentHTML('afterend', '<p></p>');
   var errorMessageHTML = commentField.nextElementSibling;
@@ -67,6 +78,15 @@
     uploadForm.submit();
     resetToDefault();
   }
+  // ///////////////////////////////////
+  var defaultEffectsObject = {
+    chrome: 'grayscale(1)',
+    sepia: 'sepia(1)',
+    marvin: 'invert(100%)',
+    phobos: 'blur(5px)',
+    heat: 'brightness(3)'
+  };
+  // //////////////////////////////////
 
   // выбор эффекта по радиокнопке
   function onRadioEffectClick(event) {
@@ -76,6 +96,14 @@
         image.setAttribute('class', '');
         image.classList.add('effect-image-preview');
         image.classList.add(effect);
+        if (image.classList[1] !== 'effect-none') {
+          var defaultEffect = effect.slice(7);
+          image.style.filter = defaultEffectsObject[defaultEffect];
+          //   effectsSliderContainer.classList.remove('hidden');
+        } else {
+        //  effectsSliderContainer.classList.add('hidden');
+          image.style.filter = 'none';
+        }
       }
     });
   }
@@ -184,12 +212,6 @@
   window.form.initUploadForm();
 
   // ползунок
-  // переменные для ползунка
-  var slider = document.querySelector('.upload-effect-level-line');
-  var thumb = slider.querySelector('.upload-effect-level-pin');
-  thumb.style.position = 'relative';
-  var saturationValue = document.querySelector('.upload-effect-level-value');
-  var saturationLevel = slider.querySelector('.upload-effect-level-val');
 
   // получаем координаты слайдера
 
@@ -209,7 +231,6 @@
     // получаем координаты самой точки
     var thumbClientCoords = thumb.getBoundingClientRect();
     var thumbCoords = {};
-    console.log(thumbCoords);
     thumbCoords.top = thumbClientCoords.top + pageYOffset;
 	  thumbCoords.left = thumbClientCoords.left + pageXOffset;
 
@@ -227,7 +248,7 @@
       var newLeft = moveEvent.pageX - sliderCoords.left - shiftX;
       if (newLeft < 0) {
         newLeft = 0;
-      }// если меньше нуля, обнуляем
+      }// если меньше нуля, обнуляем, чтоб не ехала левее
       if (newLeft > right) {
         newLeft = right;
       }// если мышь уходит вправо, не позволяем выйти ей за максим.возможное расстояние
@@ -244,13 +265,17 @@
         heat: 'brightness(' + (newLeft / right).toFixed(1) * 3 + ')'
       };
       // смотрим в классе эффект, если он есть
-      if (image.classList[1]) { // добавляем обработку с ползунком
+      if (image.classList[1] !== 'effect-none') { // добавляем обработку с ползунком
         var effect = image.classList[1].slice(7);
         image.style.filter = effectsObject[effect];
       }
+      // else {
+      // image.style.filter = 'none';
+      // }
       return false;
     };
 
+    // MOUSEUP
     var onMouseUp = function (upEvent) {
       upEvent.preventDefault();
       document.removeEventListener('mousemove', onMouseMove);
