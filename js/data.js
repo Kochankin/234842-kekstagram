@@ -33,15 +33,17 @@
     };
   }
 
-  window.data = {
-    // генерация массива с 25 объектами
-    getPhotosData: function (count) {
-      var photosData = [];
-      for (var i = 0; i < count; i++) {
-        photosData.push(generatePhotoData(i + 1));
-      }
-      return photosData;
+  // генерация массива с 25 объектами
+  function getPhotosData(count) {
+    var photosData = [];
+    for (var i = 0; i < count; i++) {
+      photosData.push(generatePhotoData(i + 1));
     }
+    return photosData;
+  }
+
+  window.data = {
+    getPhotosData: getPhotosData
   };
 
 })();

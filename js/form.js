@@ -33,7 +33,7 @@
   var saturationLevel = slider.querySelector('.upload-effect-level-val');
 
   // прячем ползунок
- // effectsSliderContainer.classList.add('hidden');
+  // effectsSliderContainer.classList.add('hidden');
 
   // узел для сообщений об ошибке
   commentField.insertAdjacentHTML('afterend', '<p></p>');
@@ -100,20 +100,20 @@
         image.classList.add('effect-image-preview');
         image.classList.add(effect);
         // ползунок
-        saturationValue.value = 100;
         if (image.classList[1] !== 'effect-none') {
+          saturationValue.value = 100;
           saturationLevel.style.width = '100%';
           var defaultEffect = effect.slice(7);
           // эффекты по умолчанию
           var defaultEffectsObject = addEffect(1, 1);
           image.style.filter = defaultEffectsObject[defaultEffect];
           thumb.style.left = slider.offsetWidth + 'px';
-           /*if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') !== -1){
+          /* if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') !== -1){
            effectsSliderContainer.classList.remove('hidden');
            }*/
         } else {
           image.style.filter = 'none';
-           /*if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1){
+          /* if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1){
            effectsSliderContainer.classList.add('hidden');
            }*/
         }
@@ -212,50 +212,53 @@
     }
   }
 
+
+  function initUploadForm() {
+    // открываем форму загрузки фото
+    uploadImgFile.addEventListener('change', openUploadForm);
+    uploadForm.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        uploadImgFile.click();
+      }
+    });
+    // закрываем форму загрузки фото
+    closeButton.addEventListener('click', closeUploadForm);
+    closeButton.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        closeUploadForm();
+      }
+    });
+    // отправка формы с фото
+    submitButton.addEventListener('click', submitPhoto);
+    submitButton.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        submitPhoto();
+      }
+    });
+    // эффекты для фото
+    document.body.addEventListener('click', onRadioEffectClick);
+    // изменение масштаба фото
+    uploadOverlay.addEventListener('click', onResizeIconClick);
+    // валидация формы
+    uploadForm.addEventListener('input', onFormFillingIn);
+  }
+
   window.form = {
-    initUploadForm: function () {
-      // открываем форму загрузки фото
-      uploadImgFile.addEventListener('change', openUploadForm);
-      uploadForm.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          uploadImgFile.click();
-        }
-      });
-      // закрываем форму загрузки фото
-      closeButton.addEventListener('click', closeUploadForm);
-      closeButton.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          closeUploadForm();
-        }
-      });
-      // отправка формы с фото
-      submitButton.addEventListener('click', submitPhoto);
-      submitButton.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          submitPhoto();
-        }
-      });
-      // эффекты для фото
-      document.body.addEventListener('click', onRadioEffectClick);
-      // изменение масштаба фото
-      uploadOverlay.addEventListener('click', onResizeIconClick);
-      // валидация формы
-      uploadForm.addEventListener('input', onFormFillingIn);
-    }
+    initUploadForm: initUploadForm
   };
 
-  window.form.initUploadForm();
+  initUploadForm();
 
- // if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1) {
-    // получаем координаты слайдера
-    var sliderClientCoords = slider.getBoundingClientRect();
-    var sliderCoords = {};
-    sliderCoords.top = sliderClientCoords.top + pageYOffset;
-    sliderCoords.left = sliderClientCoords.left + pageXOffset;
-    saturationLevel.style.top = '1%';
-  //}
+  // if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1) {
+  // получаем координаты слайдера
+  var sliderClientCoords = slider.getBoundingClientRect();
+  var sliderCoords = {};
+  sliderCoords.top = sliderClientCoords.top + pageYOffset;
+  sliderCoords.left = sliderClientCoords.left + pageXOffset;
+  saturationLevel.style.top = '1%';
+  // }
 
-  //if (Array.prototype.indexOf.call((effectsSliderContainer.classList, 'hidden') === -1) ){
+  // if (Array.prototype.indexOf.call((effectsSliderContainer.classList, 'hidden') === -1) ){
   // ОБРАБОТЧИК ДЛЯ ПОЛЗУНКА
   // MOUSEDOWN
   thumb.addEventListener('mousedown', function (event) {
@@ -281,7 +284,7 @@
       moveEvent.preventDefault();
 
       // =от текущего положения мыши до левого края слайдера
-      var newLeft = moveEvent.pageX - sliderCoords.left - shiftX;
+      var newLeft = moveEvent.pageX - sliderCoords.left;
       if (newLeft < 0) {
         newLeft = 0;
       }// если меньше нуля, обнуляем, чтоб не ехала левее
@@ -313,5 +316,5 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
-//}
+// }
 })();
