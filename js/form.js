@@ -24,6 +24,14 @@
 
   var uploadEffectControls = document.querySelector('.upload-effect-controls');// блок с мини-превьюшками эффектов
 
+  // переменные для ползунка
+  var effectsSliderContainer = document.querySelector('.upload-effect-level');
+  var slider = document.querySelector('.upload-effect-level-line');
+  var thumb = slider.querySelector('.upload-effect-level-pin');
+  thumb.style.position = 'relative';
+  var saturationValue = document.querySelector('.upload-effect-level-value');// значение value 
+  var saturationLevel = slider.querySelector('.upload-effect-level-val');// желтая заливка линии
+
   // узел для сообщений об ошибке
   commentField.insertAdjacentHTML('afterend', '<p></p>');
   var errorMessageHTML = commentField.nextElementSibling;
@@ -48,6 +56,7 @@
   function openUploadForm() {
     uploadOverlay.classList.remove('hidden');
     document.addEventListener('keydown', onEscPress);
+    resetSlider();
   }
   // закрыть форму загрузки фото
   function closeUploadForm() {
@@ -68,16 +77,51 @@
     resetToDefault();
   }
 
+  // генерация эффектов
+  function addEffect(eLeft, eRight) {
+    var effectsObject = {
+      chrome: 'grayscale(' + (eLeft / eRight).toFixed(1) + ')',
+      sepia: 'sepia(' + (eLeft / eRight).toFixed(1) + ')',
+      marvin: 'invert(' + (eLeft / eRight).toFixed(1) + ')',
+      phobos: 'blur(' + Math.round(eLeft / eRight * 3) + 'px)',
+      heat: 'brightness(' + (eLeft / eRight).toFixed(1) * 3 + ')'
+    };
+    return effectsObject;
+  }
+
   // выбор эффекта по радиокнопке
   function onRadioEffectClick(event) {
-    event.path.forEach(function (element) {
+    for (var i = 0; i < event.path.length; i++) {
+      var element = event.path[i];
       if (element.classList && element.classList.contains('upload-effect-label')) {
         var effect = element.previousElementSibling.getAttribute('id').slice(7);
         image.setAttribute('class', '');
         image.classList.add('effect-image-preview');
         image.classList.add(effect);
+        // ползунок
+        resetSlider();
+        if (image.classList[1] !== 'effect-none') {
+          var defaultEffect = effect.slice(7);
+          // эффекты по умолчанию
+          var defaultEffectsObject = addEffect(1, 1);
+          image.style.filter = defaultEffectsObject[defaultEffect];
+          if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') !== -1) {
+            effectsSliderContainer.classList.remove('hidden');
+          }
+        } else {
+          image.style.filter = 'none';
+          if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1) {
+            effectsSliderContainer.classList.add('hidden');
+          }
+        }
       }
-    });
+    }
+  }
+
+  function resetSlider() {
+    saturationValue.value = 100;
+    saturationLevel.style.width = '100%';
+    thumb.style.left = '100%';
   }
 
   // увеличение и уменьшение масштаба фото
@@ -149,37 +193,96 @@
     }
   }
 
-  window.form = {
-    initUploadForm: function () {
-      // открываем форму загрузки фото
-      uploadImgFile.addEventListener('change', openUploadForm);
-      uploadForm.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          uploadImgFile.click();
-        }
-      });
-      // закрываем форму загрузки фото
-      closeButton.addEventListener('click', closeUploadForm);
-      closeButton.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          closeUploadForm();
-        }
-      });
-      // отправка формы с фото
-      submitButton.addEventListener('click', submitPhoto);
-      submitButton.addEventListener('keydown', function (event) {
-        if (event.keyCode === window.utils.ENTER_KEYCODE) {
-          submitPhoto();
-        }
-      });
-      // эффекты для фото
-      document.body.addEventListener('click', onRadioEffectClick);
-      // изменение масштаба фото
-      uploadOverlay.addEventListener('click', onResizeIconClick);
-      // валидация формы
-      uploadForm.addEventListener('input', onFormFillingIn);
-    }
-  };
+  function initUploadForm() {
+    // открываем форму загрузки фото
+    uploadImgFile.addEventListener('change', openUploadForm);
+    uploadForm.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        uploadImgFile.click();
+      }
+    });
+    // закрываем форму загрузки фото
+    closeButton.addEventListener('click', closeUploadForm);
+    closeButton.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        closeUploadForm();
+      }
+    });
+    // отправка формы с фото
+    submitButton.addEventListener('click', submitPhoto);
+    submitButton.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        submitPhoto();
+      }
+    });
+    // эффекты для фото
+    document.body.addEventListener('click', onRadioEffectClick);
+    // изменение масштаба фото
+    uploadOverlay.addEventListener('click', onResizeIconClick);
+    // валидация формы
+    uploadForm.addEventListener('input', onFormFillingIn);
+    effectsSliderContainer.classList.add('hidden');
+  }
 
-  window.form.initUploadForm();
+  initUploadForm();
+
+  // получаем координаты слайдера
+  var sliderClientCoords = slider.getBoundingClientRect();
+  var sliderCoords = {};
+  sliderCoords.top = sliderClientCoords.top + pageYOffset;
+  sliderCoords.left = sliderClientCoords.left + pageXOffset;
+  saturationLevel.style.top = '1%';
+
+  // ОБРАБОТЧИК ДЛЯ ПОЛЗУНКА
+  // MOUSEDOWN
+  thumb.addEventListener('mousedown', function (event) {
+    event.preventDefault();
+
+    // получаем координаты самой точки
+    var thumbClientCoords = thumb.getBoundingClientRect();
+    var thumbCoords = {};
+    thumbCoords.left = thumbClientCoords.left + pageXOffset; // левая координата
+    var startX = event.clientX; // начальная позиция курсора
+    var maxRight = slider.clientWidth;// максимально возможное правое положение точки
+
+    // сдвиг мышки относительно точки
+    // var initialShiftX = event.pageX - thumbCoords.left;
+
+    // MOUSEMOVE
+    var onMouseMove = function (moveEvent) {
+      moveEvent.preventDefault();
+
+      var evtShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
+      var estimatedCoordX = thumb.offsetLeft - evtShiftX; // координата x для точки
+
+      if (estimatedCoordX < 0 || estimatedCoordX > maxRight) {
+        return;
+      }
+      startX = moveEvent.clientX; // сбрасываем начало - теперь в текущее место
+      thumb.style.left = estimatedCoordX + 'px'; // перемещаем точку в новую координату
+      saturationValue.value = Math.round(estimatedCoordX / maxRight * 100);
+      saturationLevel.style.width = saturationValue.value + '%';
+      // объект с эффектами
+      var effectsObject = addEffect(estimatedCoordX, maxRight);
+      // смотрим в классе эффект, если он есть
+      if (image.classList[1] && (image.classList[1] !== 'effect-none')) { // добавляем обработку с ползунком
+        var effect = image.classList[1].slice(7);
+        image.style.filter = effectsObject[effect];
+      }
+    };
+
+      // MOUSEUP
+    var onMouseUp = function (upEvent) {
+      upEvent.preventDefault();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  window.form = {
+    initUploadForm: initUploadForm
+  };
 })();
