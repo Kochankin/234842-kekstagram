@@ -11,12 +11,17 @@
   var image = document.querySelector('.effect-image-preview');
 
   // работа с увеличением/уменьшением
-  var SCALE_DEFAULT = '100%';
+  var scaleElement = document.querySelector('.effect-image-preview');
+  var scaleValueField = document.querySelector('.upload-resize-controls-value');
+  var scaleDownButton = document.querySelector('.upload-resize-controls-button-dec');
+  var enlargeButton = document.querySelector('.upload-resize-controls-button-inc');
+
+  /*var SCALE_DEFAULT = '100%'; // !!!
   var scaleDownIcon = document.querySelector('.upload-resize-controls-button-dec');
-  var enlargeIcon = document.querySelector('.upload-resize-controls-button-inc');
+ /var enlargeIcon = document.querySelector('.upload-resize-controls-button-inc');
   var scaleValueField = document.querySelector('.upload-resize-controls-value');
   var scaleValue = scaleValueField.getAttribute('value');
-  var scaleStep = scaleValueField.getAttribute('step');
+  var scaleStep = scaleValueField.getAttribute('step');*/
 
   // работа с полями хештегов и комментария
   var hashtagsField = document.querySelector('.upload-form-hashtags');
@@ -39,8 +44,8 @@
 
   // сброс всех изменений фото
   function resetToDefault() {
-    scaleValueField.setAttribute('value', SCALE_DEFAULT);
-    image.style.transform = 'scale(1)';
+    scaleValueField.setAttribute('value', '100%'); 
+    image.style.transform = 'scale(1)'; 
     image.setAttribute('class', '');
     image.classList.add('effect-image-preview');
     var radioEffect = uploadEffectControls.querySelectorAll('[type=radio]');
@@ -125,7 +130,7 @@
   }
 
   // увеличение и уменьшение масштаба фото
-  function onResizeIconClick(event) {
+ /* function onResizeIconClick(event) { // !!!
     event.path.forEach(function (element) {
       if (element === scaleDownIcon && scaleValue !== '25%') {
         scaleValue = (parseInt(scaleValue, 10) - scaleStep) + '%';
@@ -136,6 +141,11 @@
       scaleValueField.setAttribute('value', scaleValue);
       image.style.transform = 'scale(' + parseInt(scaleValue, 10) * 0.01 + ')';
     });
+  }*/
+
+  function adjustScale(value) {
+    scaleValueField.setAttribute('value', value);
+    scaleElement.style.transform = 'scale(' + parseInt(value, 10) * 0.01 + ')';
   }
 
   // оформление ошибки
@@ -218,10 +228,14 @@
     // эффекты для фото
     document.body.addEventListener('click', onRadioEffectClick);
     // изменение масштаба фото
-    uploadOverlay.addEventListener('click', onResizeIconClick);
+    //document.body.addEventListener('click', onResizeIconClick); // !!!
+    
+    window.initializeScale(scaleElement, adjustScale);
+    // здесь будет инициализация фильтров
     // валидация формы
     uploadForm.addEventListener('input', onFormFillingIn);
     effectsSliderContainer.classList.add('hidden');
+    
   }
 
   initUploadForm();
@@ -283,6 +297,9 @@
   });
 
   window.form = {
-    initUploadForm: initUploadForm
+    initUploadForm: initUploadForm,
+    scaleDownButton: scaleDownButton,
+    enlargeButton: enlargeButton,
   };
 })();
+
