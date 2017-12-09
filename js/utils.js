@@ -1,17 +1,18 @@
 'use strict';
 
-(function () {
+window.utils = {
+
 // коды для кнопок Esc и Enter
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  ESC_KEYCODE: 27,
+  ENTER_KEYCODE: 13,
 
   // генерация рандомного числа от min до max
-  function getRandomInt(min, max) {
+  getRandomInt: function (min, max) {
     return Math.floor(Math.random() * (max + 1 - min)) + min;
-  }
+  },
 
   // проверка на уникальность - если есть дубли в массиве, возвращает false
-  function isUnique(array) {
+  isUnique: function (array) {
     var items = array.slice(1);
     var itemsCount = 0;
     for (var i = 0; i < array.length; i++) {
@@ -27,12 +28,4 @@
       return true;
     }
   }
-  
-  window.utils = {
-    ESC_KEYCODE: ESC_KEYCODE,
-    ENTER_KEYCODE: ENTER_KEYCODE,
-    getRandomInt: getRandomInt,
-    isUnique: isUnique
 };
-
-})();

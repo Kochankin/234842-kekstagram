@@ -29,11 +29,8 @@
   var slider = document.querySelector('.upload-effect-level-line');
   var thumb = slider.querySelector('.upload-effect-level-pin');
   thumb.style.position = 'relative';
-  var saturationValue = document.querySelector('.upload-effect-level-value');
-  var saturationLevel = slider.querySelector('.upload-effect-level-val');
-
-  // прячем ползунок
-  // effectsSliderContainer.classList.add('hidden');
+  var saturationValue = document.querySelector('.upload-effect-level-value');// значение value 
+  var saturationLevel = slider.querySelector('.upload-effect-level-val');// желтая заливка линии
 
   // узел для сообщений об ошибке
   commentField.insertAdjacentHTML('afterend', '<p></p>');
@@ -59,6 +56,7 @@
   function openUploadForm() {
     uploadOverlay.classList.remove('hidden');
     document.addEventListener('keydown', onEscPress);
+    resetSlider();
   }
   // закрыть форму загрузки фото
   function closeUploadForm() {
@@ -93,55 +91,38 @@
 
   // выбор эффекта по радиокнопке
   function onRadioEffectClick(event) {
-    event.path.forEach(function (element) {
+    for (var i = 0; i < event.path.length; i++) {
+      var element = event.path[i];
       if (element.classList && element.classList.contains('upload-effect-label')) {
         var effect = element.previousElementSibling.getAttribute('id').slice(7);
         image.setAttribute('class', '');
         image.classList.add('effect-image-preview');
         image.classList.add(effect);
         // ползунок
+        resetSlider();
         if (image.classList[1] !== 'effect-none') {
-          saturationValue.value = 100;
-          saturationLevel.style.width = '100%';
           var defaultEffect = effect.slice(7);
           // эффекты по умолчанию
           var defaultEffectsObject = addEffect(1, 1);
           image.style.filter = defaultEffectsObject[defaultEffect];
-          thumb.style.left = slider.offsetWidth + 'px';
-          /* if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') !== -1){
-           effectsSliderContainer.classList.remove('hidden');
-           }*/
+          if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') !== -1) {
+            effectsSliderContainer.classList.remove('hidden');
+          }
         } else {
           image.style.filter = 'none';
-          /* if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1){
-           effectsSliderContainer.classList.add('hidden');
-           }*/
+          if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1) {
+            effectsSliderContainer.classList.add('hidden');
+          }
         }
       }
-    });
-  }
-
-  function onSaturationValueInput() {
-    if (saturationValue.value > 100) {
-      saturationValue.value = 100;
-    } else if (saturationValue.value < 0) {
-      saturationValue.value = 0;
-    } else if (!saturationValue.value) {
-      saturationLevel.style.width = '0%';
-    }
-    var left = saturationValue.value;
-    var index = 100;
-    saturationLevel.style.width = left + '%';
-    thumb.style.left = slider.offsetWidth * (left / 100) + 'px';
-    var effectsObject = addEffect(left, index);
-    if (image.classList[1] !== 'effect-none') { // добавляем обработку с ползунком
-      var effect = image.classList[1].slice(7);
-      image.style.filter = effectsObject[effect];
     }
   }
 
-  // ставлю обработчик ввода значения
-  saturationValue.addEventListener('input', onSaturationValueInput);
+  function resetSlider() {
+    saturationValue.value = 100;
+    saturationLevel.style.width = '100%';
+    thumb.style.left = '100%';
+  }
 
   // увеличение и уменьшение масштаба фото
   function onResizeIconClick(event) {
@@ -212,7 +193,6 @@
     }
   }
 
-
   function initUploadForm() {
     // открываем форму загрузки фото
     uploadImgFile.addEventListener('change', openUploadForm);
@@ -241,69 +221,54 @@
     uploadOverlay.addEventListener('click', onResizeIconClick);
     // валидация формы
     uploadForm.addEventListener('input', onFormFillingIn);
+    effectsSliderContainer.classList.add('hidden');
   }
-
-  window.form = {
-    initUploadForm: initUploadForm
-  };
 
   initUploadForm();
 
-  // if (Array.prototype.indexOf.call(effectsSliderContainer.classList, 'hidden') === -1) {
   // получаем координаты слайдера
   var sliderClientCoords = slider.getBoundingClientRect();
   var sliderCoords = {};
   sliderCoords.top = sliderClientCoords.top + pageYOffset;
   sliderCoords.left = sliderClientCoords.left + pageXOffset;
   saturationLevel.style.top = '1%';
-  // }
 
-  // if (Array.prototype.indexOf.call((effectsSliderContainer.classList, 'hidden') === -1) ){
   // ОБРАБОТЧИК ДЛЯ ПОЛЗУНКА
   // MOUSEDOWN
   thumb.addEventListener('mousedown', function (event) {
     event.preventDefault();
-    thumb.ondragstart = function () {
-      return false;
-    };
 
     // получаем координаты самой точки
     var thumbClientCoords = thumb.getBoundingClientRect();
     var thumbCoords = {};
-    thumbCoords.top = thumbClientCoords.top + pageYOffset;
-	  thumbCoords.left = thumbClientCoords.left + pageXOffset;
-
-    // максимально возможное правое положение точки
-    var right = slider.offsetWidth;
+    thumbCoords.left = thumbClientCoords.left + pageXOffset; // левая координата
+    var startX = event.clientX; // начальная позиция курсора
+    var maxRight = slider.clientWidth;// максимально возможное правое положение точки
 
     // сдвиг мышки относительно точки
-    var shiftX = event.pageX - thumbCoords.left;
+    // var initialShiftX = event.pageX - thumbCoords.left;
 
     // MOUSEMOVE
     var onMouseMove = function (moveEvent) {
       moveEvent.preventDefault();
 
-      // =от текущего положения мыши до левого края слайдера
-      var newLeft = moveEvent.pageX - sliderCoords.left;
-      if (newLeft < 0) {
-        newLeft = 0;
-      }// если меньше нуля, обнуляем, чтоб не ехала левее
-      if (newLeft > right) {
-        newLeft = right;
-      }// если мышь уходит вправо, не позволяем выйти ей за максим.возможное расстояние
-      thumb.style.left = newLeft + 'px';// задаем местонахождение
-      var percentValue = Math.round(newLeft / right * 100);
-      saturationValue.value = percentValue;
-      saturationLevel.style.width = percentValue + '%';
+      var evtShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
+      var estimatedCoordX = thumb.offsetLeft - evtShiftX; // координата x для точки
+
+      if (estimatedCoordX < 0 || estimatedCoordX > maxRight) {
+        return;
+      }
+      startX = moveEvent.clientX; // сбрасываем начало - теперь в текущее место
+      thumb.style.left = estimatedCoordX + 'px'; // перемещаем точку в новую координату
+      saturationValue.value = Math.round(estimatedCoordX / maxRight * 100);
+      saturationLevel.style.width = saturationValue.value + '%';
       // объект с эффектами
-      var effectsObject = addEffect(newLeft, right);
+      var effectsObject = addEffect(estimatedCoordX, maxRight);
       // смотрим в классе эффект, если он есть
-      if (image.classList[1] !== 'effect-none') { // добавляем обработку с ползунком
+      if (image.classList[1] && (image.classList[1] !== 'effect-none')) { // добавляем обработку с ползунком
         var effect = image.classList[1].slice(7);
         image.style.filter = effectsObject[effect];
       }
-
-      return false;
     };
 
       // MOUSEUP
@@ -316,5 +281,8 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
-// }
+
+  window.form = {
+    initUploadForm: initUploadForm
+  };
 })();
