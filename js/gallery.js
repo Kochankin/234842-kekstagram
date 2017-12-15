@@ -2,13 +2,14 @@
 
 (function () {
 
-  // обработчик при клике на картинку
   function onPictureClick(event) {
     for (var i = 0; i < event.path.length; i++) {
       var element = event.path[i];
       if (element.classList && element.classList.contains('picture')) {
-        var id = Array.prototype.indexOf.call(element.parentNode.children, element);
-        window.preview.showPhoto(window.pictures.photosData, id);
+        var url = element.querySelector('img').getAttribute('src');
+        var likes = element.querySelector('.picture-likes').textContent;
+        var comments = element.querySelector('.picture-comments').textContent;
+        window.preview.showPhoto(url, likes, comments);
         event.preventDefault();
         event.stopPropagation();
         return;
@@ -32,11 +33,6 @@
     window.preview.closePhotoIcon.addEventListener('keydown', window.preview.onCloseIconEnter);
     window.preview.closePhotoIcon.addEventListener('keydown', window.preview.onEscPress);
   }
+  initGallery();
 
-  function initPicturesAndGallery() {
-    window.pictures.initRenderPictures();
-    initGallery();
-  }
-
-  initPicturesAndGallery();
 })();

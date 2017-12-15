@@ -33,7 +33,7 @@
   saturationLevel.style.top = '1%';
 
   // узел для сообщений об ошибке
-  commentField.insertAdjacentHTML('afterend', '<p></p>');
+  commentField.insertAdjacentHTML('afterend', '<div></div>');
   var errorMessageHTML = commentField.nextElementSibling;
   errorMessageHTML.classList.add('error-message');
 
@@ -70,12 +70,6 @@
     if (event.keyCode === window.utils.ESC_KEYCODE) {
       closeUploadForm();
     }
-  }
-
-  // отправить фото
-  function submitPhoto() {
-    uploadForm.submit();
-    resetToDefault();
   }
 
   function resetSlider() {
@@ -165,13 +159,7 @@
         closeUploadForm();
       }
     });
-    // отправка формы с фото
-    submitButton.addEventListener('click', submitPhoto);
-    submitButton.addEventListener('keydown', function (event) {
-      if (event.keyCode === window.utils.ENTER_KEYCODE) {
-        submitPhoto();
-      }
-    });
+
     // работа с фильтрами
     window.initializeFilters(img, applyFilter);
     // изменение масштаба фото
@@ -182,6 +170,10 @@
   }
 
   window.form = {
+    submitButton: submitButton,
+    uploadForm: uploadForm,
+    closeUploadForm: closeUploadForm,
+    resetToDefault: resetToDefault,
     initUploadForm: initUploadForm,
     scaleDownButton: scaleDownButton,
     enlargeButton: enlargeButton,

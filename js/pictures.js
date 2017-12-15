@@ -8,33 +8,29 @@
   var commentsTepmlate = template.content.querySelector('.picture-comments');
   var likesTemplate = template.content.querySelector('.picture-likes');
 
+  var picturesContainer = document.querySelector('.pictures');
+
   // функция для вставки данных из массива в шаблон
   function getPicture(photoData) {
     imgTemplate.setAttribute('src', photoData.url);
-    commentsTepmlate.textContent = photoData.comments.length;
     likesTemplate.textContent = photoData.likes;
+    commentsTepmlate.textContent = photoData.comments.length;
     return template.content.cloneNode(true);
   }
 
   // вставляем каждый из шаблонов в фрагмент, а его в дом 
   function renderPictures(pictureData) {
     var documentFragment = document.createDocumentFragment();
-    for (var i = 0; i < pictureData.length; i++) {
+    for (var i = 0; i < 25; i++) {
       documentFragment.appendChild(getPicture(pictureData[i]));
     }
     window.pictures.picturesContainer.appendChild(documentFragment);
   }
 
   window.pictures = {
-  // массив сгенерированных объектов с данными для фото
-    photosData: [],
     // переменная контейнера, куда будут вставлены миниатюры
-    picturesContainer: document.querySelector('.pictures'),
-
-    initRenderPictures: function () {
-      window.pictures.photosData = window.data.getPhotosData(25);
-      renderPictures(window.pictures.photosData);
-    }
+    picturesContainer: picturesContainer,
+    renderPictures: renderPictures
   };
 
 })();
