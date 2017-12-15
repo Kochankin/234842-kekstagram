@@ -89,7 +89,6 @@
     if (event.keyCode === window.utils.ENTER_KEYCODE) {
       submitForm();
     }
-    
   });
 
   function renderErrorDiv(elem, errorMessage) {

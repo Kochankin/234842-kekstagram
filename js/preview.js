@@ -44,5 +44,4 @@
     onCloseIconEnter: onCloseIconEnter,
     onCloseIconClick: onCloseIconClick
   };
-  
 })();
