@@ -8,11 +8,13 @@
   var commentsTepmlate = template.content.querySelector('.picture-comments');
   var likesTemplate = template.content.querySelector('.picture-likes');
 
+  var picturesContainer = document.querySelector('.pictures');
+
   // функция для вставки данных из массива в шаблон
   function getPicture(photoData) {
     imgTemplate.setAttribute('src', photoData.url);
-    commentsTepmlate.textContent = photoData.comments.length;
     likesTemplate.textContent = photoData.likes;
+    commentsTepmlate.textContent = photoData.comments.length;
     return template.content.cloneNode(true);
   }
 
@@ -25,16 +27,21 @@
     window.pictures.picturesContainer.appendChild(documentFragment);
   }
 
-  window.pictures = {
-  // массив сгенерированных объектов с данными для фото
-    photosData: [],
-    // переменная контейнера, куда будут вставлены миниатюры
-    picturesContainer: document.querySelector('.pictures'),
+  function onLoadGet(response) {
+    renderPictures(response);
+  }
 
-    initRenderPictures: function () {
-      window.pictures.photosData = window.data.getPhotosData(25);
-      renderPictures(window.pictures.photosData);
-    }
+  // ошибка при запросе картинок (GET)
+  function onErrorGet(response) {
+    window.form.renderErrorDiv(document.body, response);
+  }
+
+  window.pictures = {
+    onLoadGet: onLoadGet,
+    onErrorGet: onErrorGet,
+    // переменная контейнера, куда будут вставлены миниатюры
+    picturesContainer: picturesContainer,
+    renderPictures: renderPictures
   };
 
 })();

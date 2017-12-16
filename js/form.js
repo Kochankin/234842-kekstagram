@@ -33,7 +33,7 @@
   saturationLevel.style.top = '1%';
 
   // узел для сообщений об ошибке
-  commentField.insertAdjacentHTML('afterend', '<p></p>');
+  commentField.insertAdjacentHTML('afterend', '<div></div>');
   var errorMessageHTML = commentField.nextElementSibling;
   errorMessageHTML.classList.add('error-message');
 
@@ -72,12 +72,6 @@
     }
   }
 
-  // отправить фото
-  function submitPhoto() {
-    uploadForm.submit();
-    resetToDefault();
-  }
-
   function resetSlider() {
     saturationValue.value = 100;
     saturationLevel.style.width = '100%';
@@ -95,12 +89,12 @@
     scaleElement.style.transform = 'scale(' + parseInt(value, 10) * 0.01 + ')';
   }
 
-  // оформление ошибки
+  // оформление ошибки заполнения формы
   function makeBorderRed(element) {
     element.style.borderColor = 'red';
     element.style.borderWidth = '2px';
   }
-  // убираем оформление ошибки
+  // убираем оформление ошибки заполнения формы
   function removeErrorAlarm() {
     errorMessageHTML.textContent = '';
     submitButton.removeAttribute('disabled');
@@ -108,6 +102,35 @@
     commentField.style.borderColor = 'black';
     hashtagsField.style.borderWidth = '1px';
     commentField.style.borderWidth = '1px';
+  }
+
+  // оформление сообщения об ошибке при отправке формы
+  function renderErrorDiv(elem, errorMessage) {
+    if (!document.body.querySelector('.error-style')) {
+      var errorDiv = document.createElement('div');
+      errorDiv.textContent = errorMessage;
+      errorDiv.setAttribute('class', 'error-style');
+
+      var warningImg = document.createElement('img');
+      warningImg.setAttribute('class', 'warning-img');
+
+      var close = document.createElement('span');
+      close.textContent = 'X';
+      close.setAttribute('class', 'close-img');
+      close.addEventListener('click', function () {
+        errorDiv.parentElement.removeChild(errorDiv);
+      });
+      warningImg.setAttribute('src', 'img/icon-warning.png');
+      errorDiv.insertAdjacentElement('afterbegin', warningImg);
+      errorDiv.insertAdjacentElement('beforeend', close);
+      elem.insertAdjacentElement('beforebegin', errorDiv);
+    }
+  }
+
+  // ошибка при отправке формы (POST)
+  function onErrorPost(errorMessage) {
+    resetToDefault();
+    renderErrorDiv(submitButton, errorMessage);
   }
 
   // функция для валидации
@@ -150,6 +173,14 @@
     }
   }
 
+  // функция для отправки формы
+  function submitForm() {
+    uploadForm.addEventListener('submit', function (event) {
+      window.backend.save(new FormData(uploadForm), closeUploadForm, onErrorPost);
+      event.preventDefault();
+    });
+  }
+
   function initUploadForm() {
     // открываем форму загрузки фото
     uploadImgFile.addEventListener('change', openUploadForm);
@@ -165,13 +196,6 @@
         closeUploadForm();
       }
     });
-    // отправка формы с фото
-    submitButton.addEventListener('click', submitPhoto);
-    submitButton.addEventListener('keydown', function (event) {
-      if (event.keyCode === window.utils.ENTER_KEYCODE) {
-        submitPhoto();
-      }
-    });
     // работа с фильтрами
     window.initializeFilters(img, applyFilter);
     // изменение масштаба фото
@@ -179,10 +203,17 @@
     // валидация формы
     uploadForm.addEventListener('input', onFormFillingIn);
     effectsSliderContainer.classList.add('hidden');
+    // отправка формы
+    submitButton.addEventListener('click', submitForm);
+    submitButton.addEventListener('keydown', function (event) {
+      if (event.keyCode === window.utils.ENTER_KEYCODE) {
+        submitForm();
+      }
+    });
   }
 
   window.form = {
-    initUploadForm: initUploadForm,
+    renderErrorDiv: renderErrorDiv,
     scaleDownButton: scaleDownButton,
     enlargeButton: enlargeButton,
     effectsSliderContainer: effectsSliderContainer,

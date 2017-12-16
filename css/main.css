@@ -870,3 +870,29 @@ input[type=radio]:checked + .upload-effect-label .upload-effect-preview {
   color: red;
   width: 470px;
 }
+
+.error-style {
+  z-index: 10000;
+  margin: 10px auto;
+  padding: 10px;
+  color: red;
+  background-color:rgb(255, 229, 229);
+  border: 1px solid red;
+  position: relative;
+  font-family: Roboto, Arial, sans-serif;
+}
+.warning-img {
+  width: 25px;
+  margin: 0 10px;
+}
+
+.close-img {
+  margin: 5px;
+  margin: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  font-weight: bold;
+  cursor: pointer;
+}
