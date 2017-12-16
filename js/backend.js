@@ -2,12 +2,26 @@
 
 (function () {
 
+  var xhrData = {
+    get: {
+      data: '',
+      url: 'https://1510.dump.academy/kekstagram/data'
+    },
+    post: {
+      data: 'data',
+      url: ' https://1510.dump.academy/kekstagram'
+    }
+  }
+
+  var URL_GET = 'https://1510.dump.academy/kekstagram/data';
+  var URL_POST = ' https://1510.dump.academy/kekstagram';
+
   // сохранить с сервера (GET)
   function load(onLoad, onError) {
-    var URL = 'https://1510.dump.academy/kekstagram/data';
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
+    /// вот эти все три обьработчкиа повесить в одном месте
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
         onLoad(xhr.response);
@@ -24,23 +38,14 @@
     });
 
     xhr.timeout = 10000; // 10s
-    xhr.open('GET', URL);
+    xhr.open('GET', URL_GET);
     xhr.send();
   }
 
-  load(onLoadGet, onErrorGet);
-
-  function onLoadGet(response) {
-    window.pictures.renderPictures(response);
-  }
-
-  function onErrorGet(response) {
-    renderErrorDiv(document.body, response);
-  }
+  load(window.pictures.onLoadGet, window.pictures.onErrorGet);
 
   // загрузить на сервер (POST)
-  var save = function (data, onLoad, onError) {
-    var URL = ' https://1510.dump.academy/kekstagram';
+  function save(data, onLoad, onError) {
     var xhr = new XMLHttpRequest();
 
     xhr.responseType = 'json';
@@ -63,54 +68,8 @@
 
     xhr.timeout = 10000; // 10s
 
-    xhr.open('POST', URL);
+    xhr.open('POST', URL_POST);
     xhr.send(data);
-  };
-
-  function onLoadPost() {
-    window.form.closeUploadForm();
-  }
-
-  function onErrorPost(errorMessage) {
-    window.form.resetToDefault();
-    renderErrorDiv(window.form.submitButton, errorMessage);
-  }
-
-  function submitForm() {
-    var form = window.form.uploadForm;
-    form.addEventListener('submit', function (event) {
-      save(new FormData(form), onLoadPost, onErrorPost);
-      event.preventDefault();
-    });
-  }
-
-  window.form.submitButton.addEventListener('click', submitForm);
-  window.form.submitButton.addEventListener('keydown', function (event) {
-    if (event.keyCode === window.utils.ENTER_KEYCODE) {
-      submitForm();
-    }
-  });
-
-  function renderErrorDiv(elem, errorMessage) {
-    if (!document.body.querySelector('.error-style')) {
-      var errorDiv = document.createElement('div');
-      errorDiv.textContent = errorMessage;
-      errorDiv.setAttribute('class', 'error-style');
-
-      var warningImg = document.createElement('img');
-      warningImg.setAttribute('class', 'warning-img');
-
-      var close = document.createElement('span');
-      close.textContent = 'X';
-      close.setAttribute('class', 'close-img');
-      close.addEventListener('click', function () {
-        errorDiv.parentElement.removeChild(errorDiv);
-      });
-      warningImg.setAttribute('src', 'img/icon-warning.png');
-      errorDiv.insertAdjacentElement('afterbegin', warningImg);
-      errorDiv.insertAdjacentElement('beforeend', close);
-      elem.insertAdjacentElement('beforebegin', errorDiv);
-    }
   }
 
   window.backend = {

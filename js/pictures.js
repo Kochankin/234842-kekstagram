@@ -21,13 +21,24 @@
   // вставляем каждый из шаблонов в фрагмент, а его в дом 
   function renderPictures(pictureData) {
     var documentFragment = document.createDocumentFragment();
-    for (var i = 0; i < 25; i++) {
+    for (var i = 0; i < pictureData.length; i++) {
       documentFragment.appendChild(getPicture(pictureData[i]));
     }
     window.pictures.picturesContainer.appendChild(documentFragment);
   }
 
+  function onLoadGet(response) {
+    renderPictures(response);
+  }
+
+  // ошибка при запросе картинок (GET)
+  function onErrorGet(response) {
+    window.form.renderErrorDiv(document.body, response);
+  }
+
   window.pictures = {
+    onLoadGet: onLoadGet,
+    onErrorGet: onErrorGet,
     // переменная контейнера, куда будут вставлены миниатюры
     picturesContainer: picturesContainer,
     renderPictures: renderPictures
