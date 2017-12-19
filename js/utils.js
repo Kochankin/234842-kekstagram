@@ -1,18 +1,20 @@
 'use strict';
 
-window.utils = {
-
+(function () {
 // коды для кнопок Esc и Enter
-  ESC_KEYCODE: 27,
-  ENTER_KEYCODE: 13,
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
+  var DEBOUNCE_INTERVAL = 500;  
+  var lastTimeout;
+
 
   // генерация рандомного числа от min до max
-  getRandomInt: function (min, max) {
+  function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max + 1 - min)) + min;
-  },
+  }
 
   // проверка на уникальность - если есть дубли в массиве, возвращает false
-  isUnique: function (array) {
+  function isUnique(array) {
     var items = array.slice(1);
     var itemsCount = 0;
     for (var i = 0; i < array.length; i++) {
@@ -28,4 +30,21 @@ window.utils = {
       return true;
     }
   }
-};
+
+  // для устранения дребезга
+  function debounce(func) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(func, DEBOUNCE_INTERVAL);
+  }
+
+  window.utils = {
+    ESC_KEYCODE: ESC_KEYCODE,
+    ENTER_KEYCODE: ENTER_KEYCODE,
+    getRandomInt: getRandomInt,
+    isUnique: isUnique,
+    debounce: debounce
+  };
+
+})();
