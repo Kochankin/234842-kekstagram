@@ -15,9 +15,6 @@
   var discussedButton = filtersForm.querySelector('#filter-discussed');
   var randomButton = filtersForm.querySelector('#filter-random');
   var loadedArray;
-  var originPicturesArray;
-  var DEBOUNCE_INTERVAL = 500;
-  var lastTimeout;
 
   // функция для вставки данных из массива в шаблон
   function getPicture(photoData) {
@@ -41,20 +38,11 @@
     renderPictures(response);
     filtersForm.classList.remove('filters-inactive');
     loadedArray = response;
-    originPicturesArray = loadedArray.slice();
   }
 
   // ошибка при запросе картинок (GET)
   function onErrorGet(response) {
     window.form.renderErrorDiv(document.body, response);
-  }
-
-  // для устранения дребезга
-  function debounce(func) {
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(func, DEBOUNCE_INTERVAL);
   }
 
   // функция по созданию нового массива со случайным порядком элементов внутри
@@ -73,12 +61,14 @@
   // обработчик для кнопки РЕКОМЕНДУЕМЫЕ
   function onRecommendButtonClick() {
     picturesContainer.innerHTML = '';
+    var originPicturesArray = loadedArray.slice();
     renderPictures(originPicturesArray);
   }
   // обработчик для кнопки ПОПУЛЯРНЫЕ
   function onPopularButtonClick() {
     picturesContainer.innerHTML = '';
-    var newPicturesArray = loadedArray.sort(function (a, b) {
+    var originPicturesArray = loadedArray.slice();
+    var newPicturesArray = originPicturesArray.sort(function (a, b) {
       var sorted = b.likes - a.likes;
       if (sorted === 0) {
         sorted = b.comments.length - a.comments.length;
@@ -90,7 +80,8 @@
   // обработчик для кнопки ОБСУЖДАЕМЫЕ
   function onDiscussedButtonClick() {
     picturesContainer.innerHTML = '';
-    var newPicturesArray = loadedArray.sort(function (a, b) {
+    var originPicturesArray = loadedArray.slice();
+    var newPicturesArray = originPicturesArray.sort(function (a, b) {
       var sorted = b.comments.length - a.comments.length;
       if (sorted === 0) {
         sorted = b.likes - a.likes;
@@ -101,24 +92,25 @@
   }
   // обработчик для кнопки СЛУЧАЙНЫЕ
   function onRandomButtonClick() {
-    var newPicturesArray = makeRandomArray(loadedArray);
     picturesContainer.innerHTML = '';
+    var originPicturesArray = loadedArray.slice();
+    var newPicturesArray = makeRandomArray(originPicturesArray);
     renderPictures(newPicturesArray);
   }
 
   // инициация обработчиков
   function filtersButtonInit() {
     randomButton.addEventListener('click', function () {
-      debounce(onRandomButtonClick);
+      window.utils.debounce(onRandomButtonClick);
     });
     popularButton.addEventListener('click', function () {
-      debounce(onPopularButtonClick);
+      window.utils.debounce(onPopularButtonClick);
     });
     discussedButton.addEventListener('click', function () {
-      debounce(onDiscussedButtonClick);
+      window.utils.debounce(onDiscussedButtonClick);
     });
     recommendButton.addEventListener('click', function () {
-      debounce(onRecommendButtonClick);
+      window.utils.debounce(onRecommendButtonClick);
     });
   }
 
