@@ -15,16 +15,13 @@
 
   // проверка на уникальность - если есть дубли в массиве, возвращает false
   function isUnique(array) {
-    var items = array.slice(1);
-    var itemsCount = 0;
-    for (var i = 0; i < array.length; i++) {
-      for (var j = 0; j < items.length; j++) {
-        if (array[i] === items[j]) {
-          itemsCount++;
-        }
+    var storage = [];
+    array.forEach(function (currentValue) {
+      if (!storage.includes(currentValue)) {
+        storage.push(currentValue);
       }
-    }
-    if (itemsCount > array.length) {
+    });
+    if (array.length > storage.length) {
       return false;
     } else {
       return true;

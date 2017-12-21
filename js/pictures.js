@@ -69,11 +69,11 @@
     picturesContainer.innerHTML = '';
     var originPictures = loadedPictures.slice();
     var newPictures = originPictures.sort(function (a, b) {
-      var sorted = b.likes - a.likes;
-      if (sorted === 0) {
-        sorted = b.comments.length - a.comments.length;
+      var difference = b.likes - a.likes;
+      if (difference === 0) {
+        difference = b.comments.length - a.comments.length;
       }
-      return sorted;
+      return difference;
     });
     renderPictures(newPictures);
   }
@@ -82,11 +82,11 @@
     picturesContainer.innerHTML = '';
     var originPictures = loadedPictures.slice();
     var newPictures = originPictures.sort(function (a, b) {
-      var sorted = b.comments.length - a.comments.length;
-      if (sorted === 0) {
-        sorted = b.likes - a.likes;
+      var difference = b.comments.length - a.comments.length;
+      if (difference === 0) {
+        difference = b.likes - a.likes;
       }
-      return sorted;
+      return difference;
     });
     renderPictures(newPictures);
   }

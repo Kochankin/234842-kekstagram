@@ -20,7 +20,7 @@
   }
 
   // функция для открытия с помощью табов и Enter
-  function onPictureEnter(event) {
+  function onPictureEnterKeydown(event) {
     if (event.keyCode === window.utils.ENTER_KEYCODE) {
       onPictureClick();
     }
@@ -28,7 +28,7 @@
 
   function openGallery() {
     window.pictures.picturesContainer.addEventListener('click', onPictureClick, true);
-    window.pictures.picturesContainer.addEventListener('keydown', onPictureEnter);  
+    window.pictures.picturesContainer.addEventListener('keydown', onPictureEnterKeydown);
   }
 
   function closeGallery() {

@@ -100,8 +100,8 @@
       // MOUSEMOVE
       function onMouseMove(moveEvent) {
         moveEvent.preventDefault();
-        var evtShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
-        var estimatedCoordX = thumb.offsetLeft - evtShiftX; // координата x для точки
+        var eventShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
+        var estimatedCoordX = thumb.offsetLeft - eventShiftX; // координата x для точки
         if (estimatedCoordX < 0 || estimatedCoordX > maxRight) {
           return;
         }
