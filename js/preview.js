@@ -7,7 +7,6 @@
   var galleryOverlayImage = document.querySelector('.gallery-overlay-image');
   var likesCount = document.querySelector('.likes-count');
   var commentsCount = document.querySelector('.comments-count');
-
   var closePhotoIcon = document.querySelector('.gallery-overlay-close');
 
   function onEscPress(event) {
@@ -35,6 +34,9 @@
   function onCloseIconClick() {
     galleryOverlay.classList.add('hidden');
     document.removeEventListener('keydown', window.preview.onEscPress);
+    window.preview.closePhotoIcon.removeEventListener('click', onCloseIconClick);
+    window.preview.closePhotoIcon.removeEventListener('keydown', onCloseIconEnter);
+    window.preview.closePhotoIcon.removeEventListener('keydown', onEscPress);
   }
 
   window.preview = {

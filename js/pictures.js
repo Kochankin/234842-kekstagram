@@ -14,7 +14,7 @@
   var popularButton = filtersForm.querySelector('#filter-popular');
   var discussedButton = filtersForm.querySelector('#filter-discussed');
   var randomButton = filtersForm.querySelector('#filter-random');
-  var loadedArray;
+  var loadedPictures;
 
   // функция для вставки данных из массива в шаблон
   function getPicture(photoData) {
@@ -37,7 +37,7 @@
   function onLoadGet(response) {
     renderPictures(response);
     filtersForm.classList.remove('filters-inactive');
-    loadedArray = response;
+    loadedPictures = response;
   }
 
   // ошибка при запросе картинок (GET)
@@ -46,56 +46,56 @@
   }
 
   // функция по созданию нового массива со случайным порядком элементов внутри
-  function makeRandomArray(array) {
-    var newArray = [];
+  function makeShuffledArray(array) {
+    var shuffledElems = [];
     array.forEach(function (currentValue) {
       var newIndex = window.utils.getRandomInt(0, (array.length - 1));
-      while (newArray[newIndex]) {
+      while (shuffledElems[newIndex]) {
         newIndex = window.utils.getRandomInt(0, (array.length - 1));
       }
-      newArray[newIndex] = currentValue;
+      shuffledElems[newIndex] = currentValue;
     });
-    return newArray;
+    return shuffledElems;
   }
 
   // обработчик для кнопки РЕКОМЕНДУЕМЫЕ
   function onRecommendButtonClick() {
     picturesContainer.innerHTML = '';
-    var originPicturesArray = loadedArray.slice();
-    renderPictures(originPicturesArray);
+    var originPictures = loadedPictures.slice();
+    renderPictures(originPictures);
   }
   // обработчик для кнопки ПОПУЛЯРНЫЕ
   function onPopularButtonClick() {
     picturesContainer.innerHTML = '';
-    var originPicturesArray = loadedArray.slice();
-    var newPicturesArray = originPicturesArray.sort(function (a, b) {
+    var originPictures = loadedPictures.slice();
+    var newPictures = originPictures.sort(function (a, b) {
       var sorted = b.likes - a.likes;
       if (sorted === 0) {
         sorted = b.comments.length - a.comments.length;
       }
       return sorted;
     });
-    renderPictures(newPicturesArray);
+    renderPictures(newPictures);
   }
   // обработчик для кнопки ОБСУЖДАЕМЫЕ
   function onDiscussedButtonClick() {
     picturesContainer.innerHTML = '';
-    var originPicturesArray = loadedArray.slice();
-    var newPicturesArray = originPicturesArray.sort(function (a, b) {
+    var originPictures = loadedPictures.slice();
+    var newPictures = originPictures.sort(function (a, b) {
       var sorted = b.comments.length - a.comments.length;
       if (sorted === 0) {
         sorted = b.likes - a.likes;
       }
       return sorted;
     });
-    renderPictures(newPicturesArray);
+    renderPictures(newPictures);
   }
   // обработчик для кнопки СЛУЧАЙНЫЕ
   function onRandomButtonClick() {
     picturesContainer.innerHTML = '';
-    var originPicturesArray = loadedArray.slice();
-    var newPicturesArray = makeRandomArray(originPicturesArray);
-    renderPictures(newPicturesArray);
+    var originPictures = loadedPictures.slice();
+    var newPictures = makeShuffledArray(originPictures);
+    renderPictures(newPictures);
   }
 
   // инициация обработчиков
@@ -119,8 +119,7 @@
   window.pictures = {
     onLoadGet: onLoadGet,
     onErrorGet: onErrorGet,
-    picturesContainer: picturesContainer,
-    renderPictures: renderPictures
+    picturesContainer: picturesContainer
   };
 
 })();

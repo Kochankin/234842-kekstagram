@@ -12,7 +12,8 @@
 
     // увеличение и уменьшение масштаба фото
     function onResizeButtonClick(event) {
-      event.path.forEach(function (element) {
+      var path = event.path || (event.composedPath && event.composedPath() || window.utils.composedPath(event.target));
+      path.forEach(function (element) {
         if (element === window.form.scaleDownButton && value !== SCALE_MIN) {
           value = (parseInt(value, 10) - SCALE_STEP) + '%';
         }
@@ -24,6 +25,10 @@
     }
 
     document.body.addEventListener('click', onResizeButtonClick);
+
+    window.scaleListener = {
+      onResizeButtonClick: onResizeButtonClick
+    };
 
   };
 

@@ -4,7 +4,7 @@
 // коды для кнопок Esc и Enter
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
-  var DEBOUNCE_INTERVAL = 500;  
+  var DEBOUNCE_INTERVAL = 500;
   var lastTimeout;
 
 
@@ -39,12 +39,28 @@
     lastTimeout = window.setTimeout(func, DEBOUNCE_INTERVAL);
   }
 
+  // полифилл для path / composedPath
+  function composedPath(el) {
+    var path = [];
+    while (el) {
+      path.push(el);
+      if (el.tagName === 'HTML') {
+        path.push(document);
+        path.push(window);
+        return path;
+      }
+      el = el.parentElement;
+    }
+    return path;
+  }
+
   window.utils = {
     ESC_KEYCODE: ESC_KEYCODE,
     ENTER_KEYCODE: ENTER_KEYCODE,
     getRandomInt: getRandomInt,
     isUnique: isUnique,
-    debounce: debounce
+    debounce: debounce,
+    composedPath: composedPath
   };
 
 })();

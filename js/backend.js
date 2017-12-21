@@ -44,7 +44,7 @@
   }
 
   window.backend = {
-    load: load,
+    load: load, // перенести надо бы вызов load(...)
     save: save
   };
 

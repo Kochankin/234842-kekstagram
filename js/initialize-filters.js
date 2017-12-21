@@ -2,7 +2,7 @@
 
 (function () {
 
-  window.initializeFilters = function (image, callback) {
+  window.initializeFilters = function filtersInit(image, callback) {
 
     var effectsSliderContainer = window.form.effectsSliderContainer;
     var slider = window.form.slider;
@@ -27,11 +27,11 @@
 
     // добавляем data-effect для будущего target события клика
     var effectRadios = document.querySelectorAll('[name=effect]');
-    var effectsArray = [];
+    var effects = [];
     for (var j = 0; j < effectRadios.length; j++) {
       var valueEffect = effectRadios[j].getAttribute('value');
       effectRadios[j].nextElementSibling.setAttribute('data-effect', valueEffect);
-      effectsArray.push(valueEffect);
+      effects.push(valueEffect);
     }
 
     function resetFilter(elem) {
@@ -56,10 +56,11 @@
     image.classList.add('effect-none');
     // выбор эффекта по радиокнопке 
     function onRadioEffectClick(event) {
-      for (var i = 0; i < event.path.length; i++) {
-        var element = event.path[i];
+      var path = event.path || (event.composedPath && event.composedPath() || window.utils.composedPath(event.target));
+      for (var i = 0; i < path.length; i++) {
+        var element = path[i];
         if (element.classList && element.classList.contains(targetElement)) {
-          effectsArray.forEach(function (item) {
+          effects.forEach(function (item) {
             if (image.classList.contains('effect-' + item)) {
               oldFilter = item;
             }
@@ -73,17 +74,17 @@
           // показ-скрывание ползунка
           if (newFilter !== 'none') {
             show(effectsSliderContainer);
+            thumb.addEventListener('mousedown', onThumbMouseDown);
           } else {
             hide(effectsSliderContainer);
+            thumb.removeEventListener('mousedown', onThumbMouseDown);
           }
         }
       }
     }
     document.body.addEventListener('click', onRadioEffectClick);
 
-    // / ОБРАБОТЧИК ДЛЯ ПОЛЗУНКА
-    // MOUSEDOWN
-    thumb.addEventListener('mousedown', function (event) {
+    function onThumbMouseDown(event) {
       event.preventDefault();
 
       // получаем координаты самой точки
@@ -97,7 +98,7 @@
       // var cursorShiftX = event.pageX - thumbCoords.left;
 
       // MOUSEMOVE
-      var onMouseMove = function (moveEvent) {
+      function onMouseMove(moveEvent) {
         moveEvent.preventDefault();
         var evtShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
         var estimatedCoordX = thumb.offsetLeft - evtShiftX; // координата x для точки
@@ -113,18 +114,22 @@
         // добавляем обработку с ползунком
         var sliderEffect = image.classList[1].slice(7);
         image.style.filter = effectsObject[sliderEffect];
-      };
+      }
 
       // MOUSEUP
-      var onMouseUp = function (upEvent) {
+      function onMouseUp(upEvent) {
         upEvent.preventDefault();
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-      };
+      }
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
-    });
+    }
+
+    window.filtersListener = {
+      onRadioEffectClick: onRadioEffectClick
+    };
   };
 
 })();
