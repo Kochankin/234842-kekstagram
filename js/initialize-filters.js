@@ -2,7 +2,7 @@
 
 (function () {
 
-  window.initializeFilters = function (image, callback) {
+  window.initializeFilters = function filtersInit(image, callback) {
 
     var effectsSliderContainer = window.form.effectsSliderContainer;
     var slider = window.form.slider;
@@ -25,15 +25,16 @@
       return effectsObject;
     }
 
-    // добавляем data-effect для будущего target события клика
+    // добавляем data-effect для будущего target события клика + хранилище эффектов effects
     var effectRadios = document.querySelectorAll('[name=effect]');
-    var effectsArray = [];
+    var effects = [];
     for (var j = 0; j < effectRadios.length; j++) {
       var valueEffect = effectRadios[j].getAttribute('value');
       effectRadios[j].nextElementSibling.setAttribute('data-effect', valueEffect);
-      effectsArray.push(valueEffect);
+      effects.push(valueEffect);
     }
 
+    // сброс слайдера с ползунком
     function resetFilter(elem) {
       var defaultEffect = elem.getAttribute('data-effect');
       var defaultEffectsObject = addEffect(1, 1);
@@ -43,6 +44,7 @@
     function show(elem) {
       if (Array.prototype.indexOf.call(elem.classList, 'hidden') !== -1) {
         elem.classList.remove('hidden');
+        thumb.style.zIndex = '100';
       }
     }
 
@@ -56,10 +58,11 @@
     image.classList.add('effect-none');
     // выбор эффекта по радиокнопке 
     function onRadioEffectClick(event) {
-      for (var i = 0; i < event.path.length; i++) {
-        var element = event.path[i];
+      var path = event.path || (event.composedPath && event.composedPath() || window.utils.composedPath(event.target));
+      for (var i = 0; i < path.length; i++) {
+        var element = path[i];
         if (element.classList && element.classList.contains(targetElement)) {
-          effectsArray.forEach(function (item) {
+          effects.forEach(function (item) {
             if (image.classList.contains('effect-' + item)) {
               oldFilter = item;
             }
@@ -73,17 +76,17 @@
           // показ-скрывание ползунка
           if (newFilter !== 'none') {
             show(effectsSliderContainer);
+            thumb.addEventListener('mousedown', onThumbMouseDown);
           } else {
             hide(effectsSliderContainer);
+            thumb.removeEventListener('mousedown', onThumbMouseDown);
           }
         }
       }
     }
     document.body.addEventListener('click', onRadioEffectClick);
 
-    // / ОБРАБОТЧИК ДЛЯ ПОЛЗУНКА
-    // MOUSEDOWN
-    thumb.addEventListener('mousedown', function (event) {
+    function onThumbMouseDown(event) {
       event.preventDefault();
 
       // получаем координаты самой точки
@@ -93,14 +96,11 @@
       var startX = event.clientX; // начальная позиция курсора
       var maxRight = slider.clientWidth;// максимально возможное правое положение точки
 
-      // сдвиг мышки относительно точки
-      // var cursorShiftX = event.pageX - thumbCoords.left;
-
       // MOUSEMOVE
-      var onMouseMove = function (moveEvent) {
+      function onMouseMove(moveEvent) {
         moveEvent.preventDefault();
-        var evtShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
-        var estimatedCoordX = thumb.offsetLeft - evtShiftX; // координата x для точки
+        var eventShiftX = startX - moveEvent.clientX; // сдвиг курсора по оси x
+        var estimatedCoordX = thumb.offsetLeft - eventShiftX; // координата x для точки
         if (estimatedCoordX < 0 || estimatedCoordX > maxRight) {
           return;
         }
@@ -113,18 +113,22 @@
         // добавляем обработку с ползунком
         var sliderEffect = image.classList[1].slice(7);
         image.style.filter = effectsObject[sliderEffect];
-      };
+      }
 
       // MOUSEUP
-      var onMouseUp = function (upEvent) {
+      function onMouseUp(upEvent) {
         upEvent.preventDefault();
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-      };
+      }
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
-    });
+    }
+
+    window.filtersListener = {
+      onRadioEffectClick: onRadioEffectClick
+    };
   };
 
 })();

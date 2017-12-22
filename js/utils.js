@@ -4,9 +4,8 @@
 // коды для кнопок Esc и Enter
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
-  var DEBOUNCE_INTERVAL = 500;  
+  var DEBOUNCE_INTERVAL = 500;
   var lastTimeout;
-
 
   // генерация рандомного числа от min до max
   function getRandomInt(min, max) {
@@ -15,20 +14,13 @@
 
   // проверка на уникальность - если есть дубли в массиве, возвращает false
   function isUnique(array) {
-    var items = array.slice(1);
-    var itemsCount = 0;
-    for (var i = 0; i < array.length; i++) {
-      for (var j = 0; j < items.length; j++) {
-        if (array[i] === items[j]) {
-          itemsCount++;
-        }
+    var storage = [];
+    array.forEach(function (currentValue) {
+      if (!storage.includes(currentValue)) {
+        storage.push(currentValue);
       }
-    }
-    if (itemsCount > array.length) {
-      return false;
-    } else {
-      return true;
-    }
+    });
+    return array.length > storage.length ? false : true;
   }
 
   // для устранения дребезга
@@ -39,12 +31,30 @@
     lastTimeout = window.setTimeout(func, DEBOUNCE_INTERVAL);
   }
 
+  // полифилл для path / composedPath
+  function composedPath(el) {
+    var path = [];
+    while (el) {
+      path.push(el);
+      if (el.tagName === 'HTML') {
+        path.push(document);
+        path.push(window);
+        return path;
+      }
+      el = el.parentElement;
+    }
+    return path;
+  }
+
   window.utils = {
     ESC_KEYCODE: ESC_KEYCODE,
     ENTER_KEYCODE: ENTER_KEYCODE,
     getRandomInt: getRandomInt,
     isUnique: isUnique,
-    debounce: debounce
+    debounce: debounce,
+    composedPath: composedPath
   };
 
 })();
+
+
