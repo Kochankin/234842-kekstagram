@@ -26,11 +26,9 @@
   var effectsSliderContainer = document.querySelector('.upload-effect-level');
   var slider = document.querySelector('.upload-effect-level-line');
   var thumb = slider.querySelector('.upload-effect-level-pin');
-  thumb.style.position = 'relative';
   var saturationValue = document.querySelector('.upload-effect-level-value');// значение value 
   var saturationLevel = slider.querySelector('.upload-effect-level-val');// желтая заливка линии
   var targetElement = 'upload-effect-label';// для обработки клика на картинку
-  saturationLevel.style.top = '1%';
 
   // узел для сообщений об ошибке
   commentField.insertAdjacentHTML('afterend', '<div></div>');
@@ -51,9 +49,7 @@
     commentField.value = '';
   }
 
-  // открыть форму загрузки фото: ставим все обработчики формы
   function openUploadForm() {
-    // открываем форму загрузки фото
     uploadImgFile.addEventListener('change', onUploadImgFileChange);
     uploadForm.addEventListener('keydown', function (event) {
       if (event.keyCode === window.utils.ENTER_KEYCODE) {
@@ -62,7 +58,6 @@
     });
   }
 
-  // закрыть форму загрузки фото
   function onCloseButtonClick() {
     uploadOverlay.classList.add('hidden');
     resetToDefault();
@@ -107,18 +102,25 @@
   }
 
   // оформление ошибки заполнения формы
-  function makeBorderRed(element) {
-    element.style.borderColor = 'red';
-    element.style.borderWidth = '2px';
+  function makeRed(element) {
+    if (element.matches('[type=submit]')) {
+      element.style.color = 'red';
+      element.style.backgroundColor = 'rgba(187, 0, 0, 0.4)';
+    } else {
+      element.style.borderColor = 'red';
+      element.style.borderWidth = '2px';
+    }
   }
+
   // убираем оформление ошибки заполнения формы
   function removeErrorAlarm() {
     errorHTMLElement.textContent = '';
-    submitButton.removeAttribute('disabled');
     hashtagsField.style.borderColor = 'black';
     commentField.style.borderColor = 'black';
     hashtagsField.style.borderWidth = '1px';
     commentField.style.borderWidth = '1px';
+    submitButton.style.color = '#ffe753';
+    submitButton.style.backgroundColor = 'rgba(255, 231, 82, 0.2)';
   }
 
   // оформление сообщения об ошибке при отправке формы
@@ -141,6 +143,7 @@
       elem.insertAdjacentElement('beforebegin', errorDiv);
     }
 
+    // закрытие сообщения об ошибке
     function onCloseClick() {
       errorDiv.parentElement.removeChild(errorDiv);
       close.removeEventListener('click', onCloseClick);
@@ -176,17 +179,26 @@
       return hashtag.match(/#[A-Za-zА-Яа-яЁё0-9]{1,20}/);
     });
 
+    var whiteSpaceValidity = true;
+    if ((hashtagsField.value.split('  ').length - 1) > 0) {
+      whiteSpaceValidity = false;
+    }
+
     function showError() {
-      makeBorderRed(errorField);
+      makeRed(errorField);
+      makeRed(submitButton);
       var errorMessageText = '';
       errors.forEach(function (item) {
         errorMessageText += item;
         errorHTMLElement.textContent = errorMessageText;
       });
-      submitButton.setAttribute('disabled', 'disable');
+      submitButton.removeEventListener('click', onSubmitButtonClick);
+      uploadForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+      });
     }
 
-    if (!hashtagValidity) {
+    if (!hashtagValidity || !whiteSpaceValidity) {
       errors.push(errorsAlarm.symbols);
       var errorField = hashtagsField;
     }

@@ -25,7 +25,7 @@
       return effectsObject;
     }
 
-    // добавляем data-effect для будущего target события клика
+    // добавляем data-effect для будущего target события клика + хранилище эффектов effects
     var effectRadios = document.querySelectorAll('[name=effect]');
     var effects = [];
     for (var j = 0; j < effectRadios.length; j++) {
@@ -34,6 +34,7 @@
       effects.push(valueEffect);
     }
 
+    // сброс слайдера с ползунком
     function resetFilter(elem) {
       var defaultEffect = elem.getAttribute('data-effect');
       var defaultEffectsObject = addEffect(1, 1);
@@ -43,6 +44,7 @@
     function show(elem) {
       if (Array.prototype.indexOf.call(elem.classList, 'hidden') !== -1) {
         elem.classList.remove('hidden');
+        thumb.style.zIndex = '100';
       }
     }
 
@@ -93,9 +95,6 @@
       thumbCoords.left = thumbClientCoords.left + pageXOffset; // левая координата
       var startX = event.clientX; // начальная позиция курсора
       var maxRight = slider.clientWidth;// максимально возможное правое положение точки
-
-      // сдвиг мышки относительно точки
-      // var cursorShiftX = event.pageX - thumbCoords.left;
 
       // MOUSEMOVE
       function onMouseMove(moveEvent) {

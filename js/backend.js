@@ -6,11 +6,7 @@
 
   function addXhrHandlers(xhr, onLoad, onError) {
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
-        onLoad(xhr.response);
-      } else {
-        onError('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
-      }
+      return (xhr.status === 200) ? onLoad(xhr.response) : onError('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
     });
 
     xhr.addEventListener('error', function () {

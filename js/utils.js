@@ -7,7 +7,6 @@
   var DEBOUNCE_INTERVAL = 500;
   var lastTimeout;
 
-
   // генерация рандомного числа от min до max
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max + 1 - min)) + min;
@@ -21,11 +20,7 @@
         storage.push(currentValue);
       }
     });
-    if (array.length > storage.length) {
-      return false;
-    } else {
-      return true;
-    }
+    return array.length > storage.length ? false : true;
   }
 
   // для устранения дребезга
@@ -61,3 +56,5 @@
   };
 
 })();
+
+
