@@ -5,7 +5,7 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var DEBOUNCE_INTERVAL = 500;
-  var lastTimeout;
+  
 
   // генерация рандомного числа от min до max
   function getRandomInt(min, max) {
@@ -13,22 +13,29 @@
   }
 
   // проверка на уникальность - если есть дубли в массиве, возвращает false
+  // спасибо Вам большое, Таинственный наставник!:) сама бы до такого элегантного решения не дошла)
   function isUnique(array) {
-    var storage = [];
-    array.forEach(function (currentValue) {
-      if (!storage.includes(currentValue)) {
-        storage.push(currentValue);
-      }
-    });
-    return array.length > storage.length ? false : true;
+    var checked = [];
+    var unique = true;
+    for (var i = 0; i < array.length && unique; i++) {
+      var item = array[i];
+      unique = !checked.includes(item);
+      checked.push(item);
+    }
+    return unique;
   }
 
   // для устранения дребезга
   function debounce(func) {
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(func, DEBOUNCE_INTERVAL);
+    var timeout;
+    return function () {
+      var ctx = null;
+      var args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        func.apply(ctx, args);
+      }, DEBOUNCE_INTERVAL);
+    };
   }
 
   // полифилл для path / composedPath

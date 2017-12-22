@@ -169,6 +169,7 @@
     if (errorHTMLElement.textContent) {
       removeErrorAlarm();
     }
+
     var errors = [];
     var hashtags = hashtagsField.value.split(' ');
     hashtags = hashtags.filter(function (hashtag) {
@@ -216,7 +217,7 @@
     }
 
     if (errors.length !== 0) {
-      window.utils.debounce(showError);
+      showError();
     }
   }
 
@@ -234,6 +235,9 @@
     }
   }
 
+  // устранение дребезга
+  var debouncedFormFillingIn = window.utils.debounce(onFormFillingIn);
+
   function onUploadImgFileChange() {
     uploadOverlay.classList.remove('hidden');
     resetSlider();
@@ -246,7 +250,7 @@
     // изменение масштаба фото
     window.initializeScale(scaleElement, adjustScale);
     // валидация формы
-    uploadForm.addEventListener('input', onFormFillingIn);
+    uploadForm.addEventListener('input', debouncedFormFillingIn);
     effectsSliderContainer.classList.add('hidden');
     // отправка формы
     submitButton.addEventListener('click', onSubmitButtonClick);

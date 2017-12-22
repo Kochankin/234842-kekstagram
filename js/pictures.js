@@ -98,20 +98,19 @@
     renderPictures(newPictures);
   }
 
+  var debounced = {
+    onRandomButtonClick: window.utils.debounce(onRandomButtonClick),
+    onPopularButtonClick: window.utils.debounce(onPopularButtonClick),
+    onDiscussedButtonClick: window.utils.debounce(onDiscussedButtonClick),
+    onRecommendButtonClick: window.utils.debounce(onRecommendButtonClick)
+  };
+
   // инициация обработчиков
   function filtersButtonInit() {
-    randomButton.addEventListener('click', function () {
-      window.utils.debounce(onRandomButtonClick);
-    });
-    popularButton.addEventListener('click', function () {
-      window.utils.debounce(onPopularButtonClick);
-    });
-    discussedButton.addEventListener('click', function () {
-      window.utils.debounce(onDiscussedButtonClick);
-    });
-    recommendButton.addEventListener('click', function () {
-      window.utils.debounce(onRecommendButtonClick);
-    });
+    randomButton.addEventListener('click', debounced.onRandomButtonClick);
+    popularButton.addEventListener('click', debounced.onPopularButtonClick);
+    discussedButton.addEventListener('click', debounced.onDiscussedButtonClick);
+    recommendButton.addEventListener('click', debounced.onRecommendButtonClick);
   }
 
   filtersButtonInit();
