@@ -28,11 +28,11 @@
     // добавляем data-effect для будущего target события клика + хранилище эффектов effects
     var effectRadios = document.querySelectorAll('[name=effect]');
     var effects = [];
-    for (var j = 0; j < effectRadios.length; j++) {
-      var valueEffect = effectRadios[j].getAttribute('value');
-      effectRadios[j].nextElementSibling.setAttribute('data-effect', valueEffect);
+    Array.prototype.forEach.call(effectRadios, function (currentValue) {
+      var valueEffect = currentValue.getAttribute('value');
+      currentValue.nextElementSibling.setAttribute('data-effect', valueEffect);
       effects.push(valueEffect);
-    }
+    });
 
     // сброс слайдера с ползунком
     function resetFilter(elem) {

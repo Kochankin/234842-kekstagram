@@ -2,10 +2,12 @@
 
 (function () {
 
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
   // для базовых операций
   var uploadForm = document.querySelector('.upload-form');
   var uploadOverlay = document.querySelector('.upload-overlay');
-  var uploadImgFile = document.querySelector('#upload-file');
+  var uploadFileButton = document.querySelector('#upload-file');
   var closeButton = document.querySelector('#upload-cancel');
   var submitButton = document.querySelector('#upload-submit');
   var img = document.querySelector('.effect-image-preview');
@@ -50,10 +52,10 @@
   }
 
   function openUploadForm() {
-    uploadImgFile.addEventListener('change', onUploadImgFileChange);
+    uploadFileButton.addEventListener('change', onUploadFileButtonChange);
     uploadForm.addEventListener('keydown', function (event) {
       if (event.keyCode === window.utils.ENTER_KEYCODE) {
-        uploadImgFile.click();
+        uploadFileButton.click();
       }
     });
   }
@@ -238,9 +240,37 @@
   // устранение дребезга
   var debouncedFormFillingIn = window.utils.debounce(onFormFillingIn);
 
-  function onUploadImgFileChange() {
+  // функция загрузки изображения 
+  function loadPreviewImg() {
+    var file = uploadFileButton.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var fileNameParts = fileName.split('.');
+
+    if (fileNameParts.length > 1) {
+      var fileType = fileNameParts.pop();
+    }
+
+    var matches = FILE_TYPES.some(function (currentValue) {
+      return currentValue === fileType;
+    });
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+        img.src = reader.result;
+      });
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function onUploadFileButtonChange() {
     uploadOverlay.classList.remove('hidden');
     resetSlider();
+    // показать превью-фото
+    loadPreviewImg();
     document.addEventListener('keydown', onEscPress);
     // закрываем форму загрузки фото
     closeButton.addEventListener('click', onCloseButtonClick);
