@@ -64,32 +64,32 @@
     var originPictures = loadedPictures.slice();
     renderPictures(originPictures);
   }
-  // обработчик для кнопки ПОПУЛЯРНЫЕ
-  function onPopularButtonClick() {
+
+  function onFilterButtonClick(param1, param2) {
     picturesContainer.innerHTML = '';
     var originPictures = loadedPictures.slice();
     var newPictures = originPictures.sort(function (a, b) {
-      var difference = b.likes - a.likes;
-      if (difference === 0) {
-        difference = b.comments.length - a.comments.length;
+      var x = param1;
+      var differenceArray = b[x].length - a[x].length;
+      var differenceString = difference = b[x] - a[x];
+      if (Array.isArray(b[param1])) {
+        var difference = differenceArray;
+        if (difference === 0) {
+          x = param2;
+          difference = differenceString;
+        }
+      } else {
+        difference = differenceString;
+        if (difference === 0) {
+          x = param2;
+          difference = differenceArray;
+        }
       }
       return difference;
     });
     renderPictures(newPictures);
   }
-  // обработчик для кнопки ОБСУЖДАЕМЫЕ
-  function onDiscussedButtonClick() {
-    picturesContainer.innerHTML = '';
-    var originPictures = loadedPictures.slice();
-    var newPictures = originPictures.sort(function (a, b) {
-      var difference = b.comments.length - a.comments.length;
-      if (difference === 0) {
-        difference = b.likes - a.likes;
-      }
-      return difference;
-    });
-    renderPictures(newPictures);
-  }
+
   // обработчик для кнопки СЛУЧАЙНЫЕ
   function onRandomButtonClick() {
     picturesContainer.innerHTML = '';
@@ -100,8 +100,12 @@
 
   var debounced = {
     onRandomButtonClick: window.utils.debounce(onRandomButtonClick),
-    onPopularButtonClick: window.utils.debounce(onPopularButtonClick),
-    onDiscussedButtonClick: window.utils.debounce(onDiscussedButtonClick),
+    onPopularButtonClick: window.utils.debounce(function () {
+      onFilterButtonClick('likes', 'comments');
+    }),
+    onDiscussedButtonClick: window.utils.debounce(function () {
+      onFilterButtonClick('comments', 'likes');
+    }),
     onRecommendButtonClick: window.utils.debounce(onRecommendButtonClick)
   };
 
