@@ -27,9 +27,9 @@
   // вставляем каждый из шаблонов в фрагмент, а его в дом 
   function renderPictures(pictureData) {
     var documentFragment = document.createDocumentFragment();
-    for (var i = 0; i < pictureData.length; i++) {
-      documentFragment.appendChild(getPicture(pictureData[i]));
-    }
+    pictureData.forEach(function (currentValue) {
+      documentFragment.appendChild(getPicture(currentValue));
+    });
     picturesContainer.appendChild(documentFragment);
   }
 
@@ -58,15 +58,8 @@
     return shuffledElems;
   }
 
-  // обработчик для кнопки РЕКОМЕНДУЕМЫЕ
-  function onRecommendButtonClick() {
-    picturesContainer.innerHTML = '';
-    var originPictures = loadedPictures.slice();
-    renderPictures(originPictures);
-  }
-
-  function onFilterButtonClick(param1, param2) {
-    picturesContainer.innerHTML = '';
+  // возвращает отсортированный массив при нажатии на popularButton или discussedButton
+  function onPopAndDiscButtonsClick(param1, param2) {
     var originPictures = loadedPictures.slice();
     var newPictures = originPictures.sort(function (a, b) {
       var x = param1;
@@ -87,34 +80,52 @@
       }
       return difference;
     });
-    renderPictures(newPictures);
+    return newPictures;
   }
 
-  // обработчик для кнопки СЛУЧАЙНЫЕ
-  function onRandomButtonClick() {
+  // обобщенная функция для всех кнопок по фильтрации 
+  function onFilterButtonClick(button) {
     picturesContainer.innerHTML = '';
-    var originPictures = loadedPictures.slice();
-    var newPictures = makeShuffledArray(originPictures);
+    var newPictures;
+    switch (button) {
+      case recommendButton:
+        newPictures = loadedPictures.slice();
+        break;
+      case popularButton:
+        newPictures = onPopAndDiscButtonsClick.bind(null, 'likes', 'comments')();
+        break;
+      case discussedButton:
+        newPictures = onPopAndDiscButtonsClick.bind(null, 'comments', 'likes')();
+        break;
+      case randomButton:
+        newPictures = makeShuffledArray(loadedPictures.slice());
+        break;
+    }
     renderPictures(newPictures);
   }
 
+  // хранилище с функциями фильтрации, очищенными от дребезга
   var debounced = {
-    onRandomButtonClick: window.utils.debounce(onRandomButtonClick),
+    onRecommendButtonClick: window.utils.debounce(function () {
+      onFilterButtonClick(recommendButton);
+    }),
     onPopularButtonClick: window.utils.debounce(function () {
-      onFilterButtonClick('likes', 'comments');
+      onFilterButtonClick(popularButton);
     }),
     onDiscussedButtonClick: window.utils.debounce(function () {
-      onFilterButtonClick('comments', 'likes');
+      onFilterButtonClick(discussedButton);
     }),
-    onRecommendButtonClick: window.utils.debounce(onRecommendButtonClick)
+    onRandomButtonClick: window.utils.debounce(function () {
+      onFilterButtonClick(randomButton);
+    })
   };
 
-  // инициация обработчиков
+  // обработчики на кнопки фильтрации
   function filtersButtonInit() {
-    randomButton.addEventListener('click', debounced.onRandomButtonClick);
+    recommendButton.addEventListener('click', debounced.onRecommendButtonClick);
     popularButton.addEventListener('click', debounced.onPopularButtonClick);
     discussedButton.addEventListener('click', debounced.onDiscussedButtonClick);
-    recommendButton.addEventListener('click', debounced.onRecommendButtonClick);
+    randomButton.addEventListener('click', debounced.onRandomButtonClick);
   }
 
   filtersButtonInit();
