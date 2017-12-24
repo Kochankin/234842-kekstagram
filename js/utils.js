@@ -5,7 +5,6 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var DEBOUNCE_INTERVAL = 500;
-  
 
   // генерация рандомного числа от min до max
   function getRandomInt(min, max) {
